@@ -1,0 +1,46 @@
+{
+    "name": "ai-selekt",
+    "version": "1.0.0",
+    "description": "Hirex REC: End-to-End Recruitment Assistant",
+    "main": "index.js",
+    "scripts": {
+        "start": "cd backend && node --no-deprecation dist/server.js",
+        "build": "npm run build:backend && npm run build:frontend",
+        "build:backend": "cd backend && npm run build",
+        "build:frontend": "cd frontend && npm run build",
+        "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+        "dev:backend": "cd backend && npm run dev",
+        "dev:frontend": "cd frontend && npm run dev",
+        "ci:all": "npm ci && npm run ci:backend && npm run ci:frontend",
+        "ci:backend": "cd backend && npm ci",
+        "ci:frontend": "cd frontend && npm ci",
+        "install:all": "npm install && npm run install:backend && npm run install:frontend",
+        "install:backend": "cd backend && npm install",
+        "install:frontend": "cd frontend && npm install",
+        "update:all": "npm update && npm run update:backend && npm run update:frontend",
+        "update:backend": "cd backend && npm update",
+        "update:frontend": "cd frontend && npm update",
+        "dedupe:all": "npm dedupe && npm run dedupe:backend && npm run dedupe:frontend",
+        "dedupe:backend": "cd backend && npm dedupe",
+        "dedupe:frontend": "cd frontend && npm dedupe",
+        "lint": "npm run lint:backend && npm run lint:frontend",
+        "lint:backend": "cd backend && npm run lint",
+        "lint:frontend": "cd frontend && npm run lint",
+        "test": "npm run test:backend && npm run test:frontend",
+        "test:backend": "cd backend && npm run test",
+        "test:frontend": "cd frontend && npm run test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Spartannikhil27/ai_selekt"
+    },
+    "keywords": [
+        "recruitment",
+        "ai"
+    ],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "concurrently": "latest"
+    }
+}

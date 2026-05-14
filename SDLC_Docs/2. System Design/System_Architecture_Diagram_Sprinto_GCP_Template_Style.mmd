@@ -1,0 +1,60 @@
+flowchart LR
+    %% ==================================================
+    %% SAMPLE-ALIGNED LAYOUT: users -> internet -> GCP
+    %% ==================================================
+    EU[End Users]
+    CD[Client Device]
+    INET[Internet]
+
+    subgraph GCP["Google Cloud Project"]
+        direction TB
+
+        subgraph REGION["Region (asia-south1)"]
+            direction TB
+
+            IGW[Internet Gateway]
+            VPN[VPN / Private Gateway]
+
+            subgraph ZONE["Zone (logical boundary)"]
+                direction TB
+                subgraph SUBNET["Subnets / Network Security Segment"]
+                    direction LR
+                    FW[VPC Firewall + ingress policy]
+                    APP[Application Code<br/>Cloud Run Fastify API + WS<br/>React static hosting]
+                end
+            end
+        end
+
+        GCS[(Cloud Storage / Firebase Bucket)]
+        SCC[Security Command Center<br/>Security posture + alerts]
+        MON[Cloud Logging + Cloud Monitoring]
+        CB[Cloud Build]
+        AR[Artifact Registry]
+    end
+
+    MONGO[(MongoDB<br/>DEFAULT_DB + per-tenant DBs)]
+    AI[OpenAI / Gemini / Claude]
+    VOICE[Deepgram + Google STT/TTS<br/>Plivo + Telnyx]
+    MSG[WhatsApp Cloud API<br/>Gmail OAuth2 / SMTP]
+    CODE[Judge0 CE]
+    MAP[Google Maps APIs]
+
+    %% Access path similar to sample
+    EU <--> CD <--> INET <--> IGW <--> VPN <--> FW <--> APP
+
+    %% App internal and external flows
+    APP <--> GCS
+    APP <--> MONGO
+    APP <--> AI
+    APP <--> VOICE
+    APP <--> MSG
+    APP <--> CODE
+    APP --> MAP
+
+    %% Security and observability
+    APP --> SCC
+    APP --> MON
+    GCS --> SCC
+
+    %% Delivery
+    CB --> AR --> APP

@@ -1,0 +1,59 @@
+{
+  "used": 2,
+  "history": [
+    {
+      "ts": "2026-01-28T06:11:09.237Z",
+      "service": "AI_CALLING_POC",
+      "amount": 1,
+      "usedAfter": 1
+    },
+    {
+      "ts": "2026-01-28T06:22:36.780Z",
+      "service": "AI_CALLING_POC",
+      "amount": 1,
+      "usedAfter": 2
+    },
+    {
+      "ts": "2026-01-28T06:25:27.226Z",
+      "service": "AI_CALLING_POC",
+      "amount": 1,
+      "usedAfter": 3
+    },
+    {
+      "ts": "2026-01-28T08:44:07.969Z",
+      "service": "AI_CALLING_POC_E2E",
+      "amount": 1,
+      "usedAfter": 4
+    },
+    {
+      "ts": "2026-01-28T08:58:23.837Z",
+      "service": "AI_CALLING_POC_E2E",
+      "amount": 1,
+      "usedAfter": 5
+    },
+    {
+      "ts": "2026-01-28T09:01:08.357Z",
+      "service": "AI_CALLING_POC_E2E",
+      "amount": 1,
+      "usedAfter": 6
+    },
+    {
+      "ts": "2026-01-28T09:03:18.799Z",
+      "service": "AI_CALLING_POC_E2E",
+      "amount": 1,
+      "usedAfter": 7
+    },
+    {
+      "ts": "2026-01-28T09:05:04.766Z",
+      "service": "AI_CALLING_POC_E2E",
+      "amount": 1,
+      "usedAfter": 1
+    },
+    {
+      "ts": "2026-01-28T09:47:55.350Z",
+      "service": "AI_CALLING_POC_E2E",
+      "amount": 1,
+      "usedAfter": 2
+    }
+  ]
+}

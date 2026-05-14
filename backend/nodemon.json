@@ -1,0 +1,15 @@
+{
+  "watch": [
+    "src",
+    "SystemChecksAndInitiators",
+    ".env",
+    "server.js",
+    "bootstrap.js",
+    "package.json",
+    "package-lock.json"
+  ],
+  "ext": "js",
+  "ignore": [
+    "src/**/*.spec.js"
+  ]
+}

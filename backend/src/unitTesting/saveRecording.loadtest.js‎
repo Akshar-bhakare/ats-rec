@@ -1,0 +1,398 @@
+/**
+ * Load test for: POST /api/ai/saveRecording
+ * External video file used > backend->src->tests-InterviewScheduleError.js->recordings->testVideo.webm
+ * Fixes OOM:
+ * - Reads ONE file once
+ * - Builds ONE base64 data URI once (when useSingleFile=true)
+ * - Does NOT prebuild payload arrays of size total
+ * - Sends requests in batches
+ *
+ * Adds:
+ * - Warmup requests (not counted in stats)
+ * - Optional sleep between batches
+ * - Resource logging (process + system memory + approx process CPU)
+ * - More stable variance check for small samples (auto bumps tolerance to 50% if total < 20)
+ */
+
+import fs from "fs";
+import path from "path";
+import os from "os";
+import { performance } from "perf_hooks";
+
+// -------------------- DEFAULT CONFIG (EDIT HERE) --------------------
+const DEFAULTS = {
+  baseUrl: "http://127.0.0.1:8080/api/ai/saveRecording",
+  token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OTE2Yjk4MDkwZDlkZjhlNmJiNDMxYzEiLCJjbGllbnQiOiI2OTE2Yjk4MDkwZDlkZjhlNmJiNDMxYzEiLCJkYk5hbWUiOiJBcHBseUN1cCIsImlhdCI6MTc2ODgxNDc2NSwiZXhwIjoxNzY4OTAxMTY1fQ.oZ783Mn181RJkbTemMQXQ189kPMK2K9rZqcEykKXuVM",
+  candidateId: "65cb76d8956f4d0012345678",
+  jobId: "65cb76d8956f4d0012345679",
+  dir: "./recordings",
+  useSingleFile: true,
+  total: 100,
+  concurrency:50,
+  tolerancePct: 25,
+
+  // ✅ NEW
+  warmup: 2, // warmup requests (not counted)
+  sleepBetweenBatchesMs: 0, // optional pause between batches
+  logResourcesEachBatch: true, // log before/after each batch
+  logResourcesIntervalMs: 0, // set >0 to log every N ms (optional)
+};
+// -------------------------------------------------------------------
+
+const args = process.argv.slice(2);
+
+const getArg = (name, def = null) => {
+  const idx = args.indexOf(`--${name}`);
+  if (idx === -1) return def;
+  const val = args[idx + 1];
+  if (!val || val.startsWith("--")) return def;
+  return val;
+};
+
+const baseUrl = getArg("baseUrl", DEFAULTS.baseUrl);
+const token = getArg("token", DEFAULTS.token);
+const candidateId = getArg("candidateId", DEFAULTS.candidateId);
+const jobId = getArg("jobId", DEFAULTS.jobId);
+const dir = getArg("dir", DEFAULTS.dir);
+const totalUploads = Number(getArg("total", String(DEFAULTS.total)));
+const concurrencyRequested = Number(getArg("concurrency", String(DEFAULTS.concurrency)));
+const tolerancePct = Number(getArg("tolerancePct", String(DEFAULTS.tolerancePct)));
+const useSingleFile =
+  String(getArg("useSingleFile", String(DEFAULTS.useSingleFile))).toLowerCase() !== "false";
+
+// ✅ NEW
+const warmup = Number(getArg("warmup", String(DEFAULTS.warmup)));
+const sleepBetweenBatchesMs = Number(getArg("sleepBetweenBatchesMs", String(DEFAULTS.sleepBetweenBatchesMs)));
+const logResourcesEachBatch =
+  String(getArg("logResourcesEachBatch", String(DEFAULTS.logResourcesEachBatch))).toLowerCase() !== "false";
+const logResourcesIntervalMs = Number(getArg("logResourcesIntervalMs", String(DEFAULTS.logResourcesIntervalMs)));
+
+if (!baseUrl || !candidateId || !jobId) {
+  console.error("Missing required config: baseUrl, candidateId, jobId");
+  process.exit(1);
+}
+
+const effectiveConcurrency = Math.min(concurrencyRequested, totalUploads);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+const mb = (n) => (n / (1024 * 1024)).toFixed(1);
+
+let lastCpuSample = process.cpuUsage();
+let lastCpuWallMs = performance.now();
+
+const logResources = (label) => {
+  const mem = process.memoryUsage(); // bytes
+  const totalMem = os.totalmem();
+  const freeMem = os.freemem();
+  const usedMem = totalMem - freeMem;
+
+  // Approx process CPU% since last sample
+  const now = performance.now();
+  const wallMs = now - lastCpuWallMs;
+  const cpu = process.cpuUsage(lastCpuSample); // microseconds since last sample
+  lastCpuSample = process.cpuUsage();
+  lastCpuWallMs = now;
+
+  const cpuMs = (cpu.user + cpu.system) / 1000; // micro -> ms
+  const cores = os.cpus()?.length || 1;
+  const procCpuPct = wallMs > 0 ? (cpuMs / wallMs) * 100 : 0;
+
+  const la = os.loadavg?.() || [0, 0, 0];
+
+  console.log(`[RESOURCES] ${label}`);
+  console.log(
+    `  Process Memory: rss=${mb(mem.rss)}MB heapUsed=${mb(mem.heapUsed)}MB heapTotal=${mb(mem.heapTotal)}MB external=${mb(mem.external)}MB`
+  );
+  console.log(
+    `  System Memory: used=${mb(usedMem)}MB / total=${mb(totalMem)}MB (${((usedMem / totalMem) * 100).toFixed(
+      1
+    )}%) free=${mb(freeMem)}MB`
+  );
+  console.log(
+    `  CPU: proc~${procCpuPct.toFixed(1)}% (cores=${cores}) | loadavg 1m=${la[0].toFixed(2)} 5m=${la[1].toFixed(
+      2
+    )} 15m=${la[2].toFixed(2)}`
+  );
+};
+
+const readFilesFromDir = (folder) => {
+  const abs = path.resolve(folder);
+  if (!fs.existsSync(abs)) throw new Error(`Directory not found: ${abs}`);
+
+  const files = fs
+    .readdirSync(abs)
+    .map((f) => path.join(abs, f))
+    .filter((p) => fs.statSync(p).isFile())
+    .filter((p) => /\.(webm|mp4|ogg|wav)$/i.test(p));
+
+  if (!files.length) {
+    throw new Error(`No media files found in ${abs}. Add .mp4/.webm/.ogg/.wav`);
+  }
+  return files;
+};
+
+const detectMimeFromExt = (filePath) => {
+  const ext = path.extname(filePath).toLowerCase();
+  if (ext === ".mp4") return "video/mp4";
+  if (ext === ".webm") return "video/webm";
+  if (ext === ".ogg") return "video/ogg";
+  if (ext === ".wav") return "audio/wav";
+  return "video/webm";
+};
+
+const toDataUriBase64 = (filePath) => {
+  const mime = detectMimeFromExt(filePath);
+  const buf = fs.readFileSync(filePath);
+  const b64 = buf.toString("base64");
+  return `data:${mime};base64,${b64}`;
+};
+
+const mean = (arr) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0);
+
+const percentile = (arr, p) => {
+  if (!arr.length) return 0;
+  const sorted = [...arr].sort((a, b) => a - b);
+  const idx = Math.floor((p / 100) * (sorted.length - 1));
+  return sorted[idx];
+};
+
+const isTransientError = (errMsg = "") => {
+  const s = String(errMsg).toLowerCase();
+  return (
+    s.includes("tlsv1 alert internal error") ||
+    s.includes("econnreset") ||
+    s.includes("etimedout") ||
+    s.includes("socket hang up") ||
+    s.includes("connection pool") ||
+    s.includes("was cleared because another operation failed") ||
+    s.includes("fetch failed")
+  );
+};
+
+const postSaveRecording = async ({ recordingData, index }) => {
+  const attempt = async () => {
+    const t0 = performance.now();
+
+    const res = await fetch(baseUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ candidateId, jobId, recordingData }),
+    });
+
+    const ms = performance.now() - t0;
+    const text = await res.text();
+
+    let json = null;
+    try {
+      json = JSON.parse(text);
+    } catch {}
+
+    return {
+      ok: res.ok,
+      status: res.status,
+      ms,
+      error: json?.error || text || `HTTP ${res.status}`,
+      url: json?.url || null,
+      scheduleId: json?.scheduleId || null,
+      index,
+    };
+  };
+
+  try {
+    const r1 = await attempt();
+
+    // Retry only transient failures (NOT 401)
+    if (!r1.ok && (r1.status === 500 || r1.status === 0) && isTransientError(r1.error)) {
+      await sleep(600);
+      const r2 = await attempt();
+      return r2;
+    }
+
+    return r1;
+  } catch (e) {
+    return { ok: false, status: 0, ms: 0, error: e?.message || String(e), index };
+  }
+};
+
+const runBatch = async ({ batchSize, recordingData, fileChooser }, batchNo, startIndex) => {
+  console.log(`\n=== Batch ${batchNo} (concurrency=${batchSize}) ===`);
+
+  if (logResourcesEachBatch) logResources(`before batch ${batchNo}`);
+
+  const tasks = [];
+  for (let i = 0; i < batchSize; i++) {
+    const globalIndex = startIndex + i;
+    const data = fileChooser ? fileChooser(globalIndex) : recordingData;
+    tasks.push(postSaveRecording({ recordingData: data, index: globalIndex }));
+  }
+
+  const results = await Promise.all(tasks);
+
+  const ok = results.filter((r) => r.ok);
+  const fail = results.filter((r) => !r.ok);
+  const times = ok.map((r) => r.ms);
+
+  console.log(`Batch ${batchNo} OK=${ok.length}, FAIL=${fail.length}`);
+
+  if (fail.length) {
+    console.log("Failures (first 5):");
+    fail.slice(0, 5).forEach((f) => {
+      console.log(
+        ` - idx=${f.index} status=${f.status} ms=${f.ms.toFixed(0)} err=${String(f.error).slice(0, 200)}`
+      );
+    });
+  }
+
+  if (times.length) {
+    console.log(
+      `Latency ms: avg=${mean(times).toFixed(0)} p50=${percentile(times, 50).toFixed(0)} p95=${percentile(
+        times,
+        95
+      ).toFixed(0)} max=${Math.max(...times).toFixed(0)}`
+    );
+  }
+
+  if (logResourcesEachBatch) logResources(`after batch ${batchNo}`);
+
+  return results;
+};
+
+const main = async () => {
+  console.log("=== saveRecording.loadtest config ===");
+  console.log({
+    baseUrl,
+    tokenProvided: !!token,
+    candidateId,
+    jobId,
+    dir: path.resolve(dir),
+    totalUploads,
+    concurrencyRequested,
+    effectiveConcurrency,
+    tolerancePct,
+    useSingleFile,
+    warmup,
+    sleepBetweenBatchesMs,
+    logResourcesEachBatch,
+    logResourcesIntervalMs,
+  });
+
+  logResources("startup");
+
+  // Optional interval resource logging
+  let intervalHandle = null;
+  if (Number.isFinite(logResourcesIntervalMs) && logResourcesIntervalMs > 0) {
+    intervalHandle = setInterval(() => logResources(`interval ${logResourcesIntervalMs}ms`), logResourcesIntervalMs);
+  }
+
+  const files = readFilesFromDir(dir);
+  console.log(`Using ${files.length} file(s) from: ${path.resolve(dir)}`);
+
+  let singleRecordingData = null;
+
+  if (useSingleFile) {
+    const chosen = files[0];
+    console.log(`Using SINGLE FILE for all uploads: ${path.basename(chosen)}`);
+    singleRecordingData = toDataUriBase64(chosen);
+    console.log(`Base64 payload size (chars): ${singleRecordingData.length}`);
+    logResources("after base64 build");
+  }
+
+  const fileChooser = !useSingleFile
+    ? (globalIndex) => {
+        const f = files[globalIndex % files.length];
+        return toDataUriBase64(f); // build per request (more CPU)
+      }
+    : null;
+
+  // ✅ WARMUP (not counted)
+  if (Number.isFinite(warmup) && warmup > 0) {
+    console.log(`\n=== Warmup (${warmup} request(s), not counted in stats) ===`);
+    const warmTasks = [];
+    for (let i = 0; i < warmup; i++) {
+      const data = fileChooser ? fileChooser(i) : singleRecordingData;
+      warmTasks.push(postSaveRecording({ recordingData: data, index: -1000 - i }));
+    }
+    const warmRes = await Promise.all(warmTasks);
+    const warmOk = warmRes.filter((r) => r.ok).length;
+    const warmFail = warmRes.filter((r) => !r.ok);
+    console.log(`Warmup OK=${warmOk}, FAIL=${warmFail.length}`);
+    if (warmFail.length) {
+      console.log("Warmup failures (first 3):");
+      warmFail.slice(0, 3).forEach((f) => console.log(` - status=${f.status} err=${String(f.error).slice(0, 200)}`));
+    }
+  }
+
+  const allResults = [];
+  let batchNo = 1;
+
+  for (let sent = 0; sent < totalUploads; sent += effectiveConcurrency) {
+    const batchSize = Math.min(effectiveConcurrency, totalUploads - sent);
+
+    const results = await runBatch(
+      { batchSize, recordingData: singleRecordingData, fileChooser },
+      batchNo++,
+      sent
+    );
+
+    allResults.push(...results);
+
+    if (sleepBetweenBatchesMs > 0) {
+      await sleep(sleepBetweenBatchesMs);
+    }
+  }
+
+  const ok = allResults.filter((r) => r.ok);
+  const fail = allResults.filter((r) => !r.ok);
+  const times = ok.map((r) => r.ms);
+
+  console.log("\n=== Overall Summary ===");
+  console.log(`Total=${allResults.length}, OK=${ok.length}, FAIL=${fail.length}`);
+
+  if (!ok.length) {
+    console.log("❌ No successful requests to compute latency stats.");
+    if (intervalHandle) clearInterval(intervalHandle);
+    logResources("end");
+    process.exitCode = 2;
+    return;
+  }
+
+  const avg = mean(times);
+  const min = Math.min(...times);
+  const max = Math.max(...times);
+  const p50 = percentile(times, 50);
+  const p95 = percentile(times, 95);
+
+  console.log(
+    `Latency ms: min=${min.toFixed(0)} avg=${avg.toFixed(0)} p50=${p50.toFixed(0)} p95=${p95.toFixed(
+      0
+    )} max=${max.toFixed(0)}`
+  );
+
+  // ✅ More stable tolerance for tiny samples (p95 is noisy when total is small)
+  const effectiveTolerancePctFinal = totalUploads < 20 ? Math.max(tolerancePct, 50) : tolerancePct;
+
+  // ✅ variance check using p95 (more stable than max), with adjusted tolerance for small totals
+  const allowedP95 = avg * (1 + effectiveTolerancePctFinal / 100);
+  const passVariance = p95 <= allowedP95;
+
+  console.log(
+    `Variance check (p95): tolerance=${effectiveTolerancePctFinal}% -> allowedP95=${allowedP95.toFixed(
+      0
+    )}ms, observedP95=${p95.toFixed(0)}ms`
+  );
+  console.log(passVariance ? "✅ PASS variance tolerance" : "❌ FAIL variance tolerance");
+
+  if (intervalHandle) clearInterval(intervalHandle);
+  logResources("end");
+
+  if (fail.length || !passVariance) process.exitCode = 2;
+};
+
+main().catch((e) => {
+  console.error("Fatal:", e);
+  process.exit(1);
+});

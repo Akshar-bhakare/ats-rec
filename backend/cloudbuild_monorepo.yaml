@@ -1,0 +1,72 @@
+steps:
+  # STEP 1: Build backend image from monorepo root using backend Dockerfile/context
+  - name: gcr.io/cloud-builders/docker
+    id: 'Build image with cache'
+    args:
+      [
+        "build",
+        "-f",
+        "backend/Dockerfile",
+        "-t",
+        "${_AR_HOSTNAME}/${_AR_PROJECT_ID}/${_AR_REPOSITORY}/${REPO_NAME}/${_SERVICE_NAME}:${COMMIT_SHA}",
+        "-t",
+        "${_AR_HOSTNAME}/${_AR_PROJECT_ID}/${_AR_REPOSITORY}/${REPO_NAME}/${_SERVICE_NAME}:latest",
+        "--cache-from=${_AR_HOSTNAME}/${_AR_PROJECT_ID}/${_AR_REPOSITORY}/${REPO_NAME}/${_SERVICE_NAME}:latest",
+        "backend"
+      ]
+
+  # STEP 2: Push both tags (commit SHA + latest)
+  - name: gcr.io/cloud-builders/docker
+    id: 'Push commit SHA image'
+    args:
+      [
+        "push",
+        "${_AR_HOSTNAME}/${_AR_PROJECT_ID}/${_AR_REPOSITORY}/${REPO_NAME}/${_SERVICE_NAME}:${COMMIT_SHA}"
+      ]
+
+  - name: gcr.io/cloud-builders/docker
+    id: 'Push latest image'
+    args:
+      [
+        "push",
+        "${_AR_HOSTNAME}/${_AR_PROJECT_ID}/${_AR_REPOSITORY}/${REPO_NAME}/${_SERVICE_NAME}:latest"
+      ]
+
+  # STEP 3: Deploy the new image to Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
+    id: Deploy
+    entrypoint: gcloud
+    args:
+      [
+        "run",
+        "services",
+        "update",
+        "${_SERVICE_NAME}",
+        "--platform=managed",
+        "--image=${_AR_HOSTNAME}/${_AR_PROJECT_ID}/${_AR_REPOSITORY}/${REPO_NAME}/${_SERVICE_NAME}:${COMMIT_SHA}",
+        "--labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=${COMMIT_SHA},gcb-build-id=${BUILD_ID},gcb-trigger-id=${_TRIGGER_ID}",
+        "--region=${_DEPLOY_REGION}",
+        "--quiet"
+      ]
+
+images:
+  - "${_AR_HOSTNAME}/${_AR_PROJECT_ID}/${_AR_REPOSITORY}/${REPO_NAME}/${_SERVICE_NAME}:${COMMIT_SHA}"
+  - "${_AR_HOSTNAME}/${_AR_PROJECT_ID}/${_AR_REPOSITORY}/${REPO_NAME}/${_SERVICE_NAME}:latest"
+
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _AR_REPOSITORY: more-caching-repo
+  _AR_PROJECT_ID: recruitai-s7ckk
+  _PLATFORM: managed
+  _SERVICE_NAME: ai-selekt-production-cache
+  _DEPLOY_REGION: asia-south1
+  _TRIGGER_ID: f0b8e93c-9159-495a-952f-a2354370239c
+  _AR_HOSTNAME: asia-south1-docker.pkg.dev
+
+tags:
+  - gcp-cloud-build-deploy-cloud-run
+  - gcp-cloud-build-deploy-cloud-run-managed
+  - ai-selekt-production-cache

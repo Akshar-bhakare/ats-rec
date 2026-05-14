@@ -1,0 +1,558 @@
+// backend/src/tests/interviewScheduleErrorTest/interviewScheduleRoutes.errorHandling.Test.js
+
+/**
+* Tests error handling for InterviewSchedule routes.
+* Verifies:
+* - 400 responses for validation errors (missing/invalid params)
+ * - 404 responses for not found cases
+* - Fastify’s default 500 handling when routes throw without try/catch
+* - Custom 500 response from routes with explicit try/catch (/:id/report)
+*/
+
+//For : > Latest-Video ,Report ,Un/Archive, id ,server Failure 
+// validation errors (400), not found errors (404), and server failures (500) 
+// for GET/POST/PUT/DELETE routes
+
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import Fastify from 'fastify';
+@@ -44,6 +49,22 @@
+}
+
+function buildServer({ models = {}, client = 'test-client' } = {}) {
+  // EventService/logging in crudBase may look up different model keys (Event, Events, EventLog, etc).
+  // We only auto-stub model names that contain "event" to avoid masking other missing models.
+  const eventStub = {
+    findOrCreate: async () => [{}, true],
+  };
+
+  const baseModels = { ...models };
+
+  const safeModels = new Proxy(baseModels, {
+    get(target, prop) {
+      if (prop in target) return target[prop];
+      if (typeof prop === 'string' && prop.toLowerCase().includes('event')) return eventStub;
+      return undefined;
+    },
+  });
+
+const fastify = Fastify({ logger: false });
+
+// Stub auth hook used by routes file
+@@ -52,7 +73,7 @@
+// Inject req.client and req.conn the way your code expects
+fastify.addHook('onRequest', async (req) => {
+req.client = client;
+    req.conn = { models };
+    req.conn = { models: safeModels };
+});
+
+// Register routes with a prefix so we can call them
+@@ -61,6 +82,9 @@
+return fastify;
+}
+
+// --------------------------
+// GET /latest-video
+// --------------------------
+test('GET /latest-video returns 400 when candidateId/jobId missing', async () => {
+logTest('GET /latest-video validation: missing params', [
+'Request: GET /api/interviewschedules/latest-video (no query params)',
+@@ -134,7 +158,6 @@
+url: `/api/interviewschedules/latest-video?candidateId=${candidateId}&jobId=${jobId}`,
+});
+
+  // Fastify default error response shape (unless you have a custom global error handler)
+assert.equal(res.statusCode, 500);
+const body = res.json();
+assert.equal(body.statusCode, 500);
+@@ -144,6 +167,86 @@
+await server.close();
+});
+
+test('GET /latest-video returns ok:true with nulls when no schedule found', async () => {
+  logTest('GET /latest-video success: not found returns ok:true + nulls', [
+    'Mock: InterviewSchedule.findOne().exec() returns null',
+    'Expected: 200 + { ok:true, scheduleId:null, startAt:null, url:null }',
+  ]);
+
+  const InterviewSchedule = {
+    findOne() {
+      return makeQueryChain({
+        execImpl: async () => null,
+      });
+    },
+  };
+
+  const server = buildServer({ models: { InterviewSchedule } });
+  await server.ready();
+
+  const candidateId = new mongoose.Types.ObjectId().toString();
+  const jobId = new mongoose.Types.ObjectId().toString();
+
+  const res = await server.inject({
+    method: 'GET',
+    url: `/api/interviewschedules/latest-video?candidateId=${candidateId}&jobId=${jobId}`,
+  });
+
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.scheduleId, null);
+  assert.equal(body.startAt, null);
+  assert.equal(body.url, null);
+
+  await server.close();
+});
+
+test('GET /latest-video returns latest schedule video url when found', async () => {
+  logTest('GET /latest-video success: returns video url when schedule exists', [
+    'Mock: InterviewSchedule.findOne().exec() returns doc with videoRecordingUrl',
+    'Expected: 200 + { ok:true, url:<videoRecordingUrl> }',
+  ]);
+
+  const fakeUrl = 'https://example.com/video.mp4';
+  const fakeId = new mongoose.Types.ObjectId();
+
+  const InterviewSchedule = {
+    findOne() {
+      return makeQueryChain({
+        execImpl: async () => ({
+          _id: fakeId,
+          startAt: new Date('2026-01-01T10:00:00.000Z'),
+          videoRecordingUrl: fakeUrl,
+        }),
+      });
+    },
+  };
+
+  const server = buildServer({ models: { InterviewSchedule } });
+  await server.ready();
+
+  const candidateId = new mongoose.Types.ObjectId().toString();
+  const jobId = new mongoose.Types.ObjectId().toString();
+
+  const res = await server.inject({
+    method: 'GET',
+    url: `/api/interviewschedules/latest-video?candidateId=${candidateId}&jobId=${jobId}`,
+  });
+
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.scheduleId, fakeId.toString());
+  assert.equal(body.url, fakeUrl);
+  assert.ok(body.startAt);
+
+  await server.close();
+});
+
+// --------------------------
+// GET /:id/report (PDF)
+// --------------------------
+test('GET /:id/report: if DB throws, route try/catch returns custom 500 payload', async () => {
+logTest('GET /:id/report error handling: route try/catch custom 500', [
+'Mock: InterviewSchedule.findOne().exec() throws "Schedule load failed"',
+@@ -172,7 +275,6 @@
+});
+
+assert.equal(res.statusCode, 500);
+
+const body = res.json();
+assert.equal(body.error, 'Internal Server Error');
+assert.ok(body.message);
+@@ -181,6 +283,40 @@
+await server.close();
+});
+
+test('GET /:id/report returns 404 when interview schedule not found', async () => {
+  logTest('GET /:id/report validation: schedule not found -> 404', [
+    'Mock: InterviewSchedule.findOne().exec() returns null',
+    'Expected: 404 + { error:"Interview not found" }',
+  ]);
+
+  const InterviewSchedule = {
+    findOne() {
+      return makeQueryChain({
+        execImpl: async () => null,
+      });
+    },
+  };
+
+  const server = buildServer({ models: { InterviewSchedule } });
+  await server.ready();
+
+  const scheduleId = new mongoose.Types.ObjectId().toString();
+
+  const res = await server.inject({
+    method: 'GET',
+    url: `/api/interviewschedules/${scheduleId}/report`,
+  });
+
+  assert.equal(res.statusCode, 404);
+  const body = res.json();
+  assert.equal(body.error, 'Interview not found');
+
+  await server.close();
+});
+
+// --------------------------
+// GET /:id (service-based)
+// --------------------------
+test('GET /:id: if service throws, Fastify returns 500 (no try/catch in route)', async () => {
+logTest('GET /:id error handling: Fastify default 500', [
+'Trigger: model findOne().exec() throws "readById boom" (if service reads via req.conn.models)',
+@@ -215,94 +351,221 @@
+await server.close();
+});
+
+
+test('GET /latest-video returns ok:true with nulls when no schedule found', async () => {
+  logTest('GET /latest-video success: not found returns ok:true + nulls', [
+    'Mock: InterviewSchedule.findOne().exec() returns null',
+    'Expected: 200 + { ok:true, scheduleId:null, startAt:null, url:null }',
+// --------------------------
+// PUT /:id/archive (direct DB update)
+// --------------------------
+test('PUT /:id/archive returns 404 when schedule not found', async () => {
+  logTest('PUT /:id/archive error handling: not found -> 404', [
+    'Mock: InterviewSchedule.findOneAndUpdate(...).lean() returns null',
+    'Expected: 404 + { error:"Not found" }',
+]);
+
+const InterviewSchedule = {
+    findOne() {
+      return makeQueryChain({
+        execImpl: async () => null,
+      });
+    findOneAndUpdate() {
+      return { lean: async () => null };
+},
+};
+
+const server = buildServer({ models: { InterviewSchedule } });
+await server.ready();
+
+  const candidateId = new mongoose.Types.ObjectId().toString();
+  const jobId = new mongoose.Types.ObjectId().toString();
+  const scheduleId = new mongoose.Types.ObjectId().toString();
+
+const res = await server.inject({
+    method: 'GET',
+    url: `/api/interviewschedules/latest-video?candidateId=${candidateId}&jobId=${jobId}`,
+    method: 'PUT',
+    url: `/api/interviewschedules/${scheduleId}/archive`,
+    payload: {},
+  });
+
+  assert.equal(res.statusCode, 404);
+  const body = res.json();
+  assert.equal(body.error, 'Not found');
+
+  await server.close();
+});
+
+test('PUT /:id/archive returns 200 when schedule archived', async () => {
+  logTest('PUT /:id/archive success: returns updated doc', [
+    'Mock: InterviewSchedule.findOneAndUpdate(...).lean() returns updated doc',
+    'Expected: 200 + updated object with isArchived:true',
+  ]);
+
+  const scheduleId = new mongoose.Types.ObjectId();
+
+  const InterviewSchedule = {
+    findOneAndUpdate(filter, update, options) {
+      assert.ok(filter?._id);
+      assert.ok(filter?.client);
+      assert.deepEqual(update, { $set: { isArchived: true } });
+      assert.deepEqual(options, { new: true });
+
+      return { lean: async () => ({ _id: scheduleId, isArchived: true }) };
+    },
+  };
+
+  const server = buildServer({ models: { InterviewSchedule } });
+  await server.ready();
+
+  const res = await server.inject({
+    method: 'PUT',
+    url: `/api/interviewschedules/${scheduleId.toString()}/archive`,
+    payload: {},
+});
+
+assert.equal(res.statusCode, 200);
+const body = res.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.scheduleId, null);
+  assert.equal(body.startAt, null);
+  assert.equal(body.url, null);
+  assert.equal(body._id, scheduleId.toString());
+  assert.equal(body.isArchived, true);
+
+await server.close();
+});
+
+test('GET /latest-video returns latest schedule video url when found', async () => {
+  logTest('GET /latest-video success: returns video url when schedule exists', [
+    'Mock: InterviewSchedule.findOne().exec() returns doc with videoRecordingUrl',
+    'Expected: 200 + { ok:true, url:<videoRecordingUrl> }',
+test('PUT /:id/archive: if DB throws, Fastify returns 500 (no try/catch in route)', async () => {
+  logTest('PUT /:id/archive error handling: Fastify default 500 on DB throw', [
+    'Mock: InterviewSchedule.findOneAndUpdate(...) throws',
+    'Route: no try/catch',
+    'Expected: 500 default Fastify error JSON',
+]);
+
+  const fakeUrl = 'https://example.com/video.mp4';
+  const fakeId = new mongoose.Types.ObjectId();
+  const InterviewSchedule = {
+    findOneAndUpdate() {
+      throw new Error('archive DB boom');
+    },
+  };
+
+  const server = buildServer({ models: { InterviewSchedule } });
+  await server.ready();
+
+  const scheduleId = new mongoose.Types.ObjectId().toString();
+
+  const res = await server.inject({
+    method: 'PUT',
+    url: `/api/interviewschedules/${scheduleId}/archive`,
+    payload: {},
+  });
+
+  assert.equal(res.statusCode, 500);
+  const body = res.json();
+  assert.equal(body.statusCode, 500);
+  assert.ok(body.error);
+  assert.ok(body.message);
+
+  await server.close();
+});
+
+// --------------------------
+// PUT /:id/unarchive (direct DB update)
+// --------------------------
+test('PUT /:id/unarchive returns 404 when schedule not found', async () => {
+  logTest('PUT /:id/unarchive error handling: not found -> 404', [
+    'Mock: InterviewSchedule.findOneAndUpdate(...).lean() returns null',
+    'Expected: 404 + { error:"Not found" }',
+  ]);
+
+const InterviewSchedule = {
+    findOne() {
+      return makeQueryChain({
+        execImpl: async () => ({
+          _id: fakeId,
+          startAt: new Date('2026-01-01T10:00:00.000Z'),
+          videoRecordingUrl: fakeUrl,
+        }),
+      });
+    findOneAndUpdate() {
+      return { lean: async () => null };
+},
+};
+
+const server = buildServer({ models: { InterviewSchedule } });
+await server.ready();
+
+  const candidateId = new mongoose.Types.ObjectId().toString();
+  const jobId = new mongoose.Types.ObjectId().toString();
+  const scheduleId = new mongoose.Types.ObjectId().toString();
+
+const res = await server.inject({
+    method: 'GET',
+    url: `/api/interviewschedules/latest-video?candidateId=${candidateId}&jobId=${jobId}`,
+    method: 'PUT',
+    url: `/api/interviewschedules/${scheduleId}/unarchive`,
+    payload: {},
+  });
+
+  assert.equal(res.statusCode, 404);
+  const body = res.json();
+  assert.equal(body.error, 'Not found');
+
+  await server.close();
+});
+
+test('PUT /:id/unarchive returns 200 when schedule unarchived', async () => {
+  logTest('PUT /:id/unarchive success: returns updated doc', [
+    'Mock: InterviewSchedule.findOneAndUpdate(...).lean() returns updated doc',
+    'Expected: 200 + updated object with isArchived:false',
+  ]);
+
+  const scheduleId = new mongoose.Types.ObjectId();
+
+  const InterviewSchedule = {
+    findOneAndUpdate(filter, update, options) {
+      assert.ok(filter?._id);
+      assert.ok(filter?.client);
+      assert.deepEqual(update, { $set: { isArchived: false } });
+      assert.deepEqual(options, { new: true });
+
+      return { lean: async () => ({ _id: scheduleId, isArchived: false }) };
+    },
+  };
+
+  const server = buildServer({ models: { InterviewSchedule } });
+  await server.ready();
+
+  const res = await server.inject({
+    method: 'PUT',
+    url: `/api/interviewschedules/${scheduleId.toString()}/unarchive`,
+    payload: {},
+});
+
+assert.equal(res.statusCode, 200);
+const body = res.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.scheduleId, fakeId.toString());
+  assert.equal(body.url, fakeUrl);
+  assert.ok(body.startAt);
+  assert.equal(body._id, scheduleId.toString());
+  assert.equal(body.isArchived, false);
+
+await server.close();
+});
+
+test('GET /:id/report returns 404 when interview schedule not found', async () => {
+  logTest('GET /:id/report validation: schedule not found -> 404', [
+    'Mock: InterviewSchedule.findOne().exec() returns null',
+    'Expected: 404 + { error:"Interview not found" }',
+// --------------------------
+// DELETE /:id (service-based)
+// --------------------------
+test('DELETE /:id returns 404 when schedule not found (via service readById)', async () => {
+  logTest('DELETE /:id error handling: not found -> 404', [
+    'Trigger: service readById returns null (commonly via InterviewSchedule.findOne -> null)',
+    'Expected: 404 + { error:"Not found" }',
+  ]);
+
+  const InterviewSchedule = {
+    findOne() {
+      return makeQueryChain({ execImpl: async () => null });
+    },
+  };
+
+  const server = buildServer({ models: { InterviewSchedule } });
+  await server.ready();
+
+  const scheduleId = new mongoose.Types.ObjectId().toString();
+
+  const res = await server.inject({
+    method: 'DELETE',
+    url: `/api/interviewschedules/${scheduleId}`,
+  });
+
+  assert.equal(res.statusCode, 404);
+  const body = res.json();
+  assert.equal(body.error, 'Not found');
+
+  await server.close();
+});
+
+test('DELETE /:id: if service path throws, Fastify returns 500 (no try/catch in route)', async () => {
+  logTest('DELETE /:id error handling: Fastify default 500', [
+    'Trigger: underlying service path throws (commonly via model exec throw)',
+    'Expected: 500 default Fastify error JSON',
+]);
+
+const InterviewSchedule = {
+findOne() {
+return makeQueryChain({
+        execImpl: async () => null,
+        execImpl: async () => {
+          throw new Error('delete path boom');
+        },
+});
+},
+};
+@@ -313,14 +576,83 @@
+const scheduleId = new mongoose.Types.ObjectId().toString();
+
+const res = await server.inject({
+    method: 'GET',
+    url: `/api/interviewschedules/${scheduleId}/report`,
+    method: 'DELETE',
+    url: `/api/interviewschedules/${scheduleId}`,
+});
+
+  assert.equal(res.statusCode, 404);
+  assert.equal(res.statusCode, 500);
+const body = res.json();
+  assert.equal(body.error, 'Interview not found');
+  assert.equal(body.statusCode, 500);
+  assert.ok(body.error);
+  assert.ok(body.message);
+
+await server.close();
+});
+
+// --------------------------
+// POST / (service-based) - service failure -> 400
+// --------------------------
+test('POST / returns 400 with { error } when service returns ok:false', async () => {
+  logTest('POST / error handling: service failure -> 400', [
+    'Call POST / with invalid/minimal payload',
+    'Expected: 400 + { error:<message> } (service handled, not Fastify 500)',
+  ]);
+
+  const server = buildServer({ models: { InterviewSchedule: {} } });
+  await server.ready();
+
+  const res = await server.inject({
+    method: 'POST',
+    url: '/api/interviewschedules/',
+    payload: {},
+  });
+
+  assert.equal(res.statusCode, 400);
+  const body = res.json();
+  assert.ok(body.error);
+
+  await server.close();
+});
+
+// --------------------------
+// PUT /:id (service-based) - not found -> 404
+// This service path can use different mongoose methods depending on your crudBase.
+// We stub multiple common update/existence methods to reliably make update "not found".
+// --------------------------
+test('PUT /:id returns 404 when update returns null (not found)', async () => {
+  logTest('PUT /:id error handling: not found -> 404', [
+    'Mock: InterviewScheduleService.update() returns null',
+    'Expected: 404 + { error:"Not found" }',
+  ]);
+
+  // Patch service method for this test only (route instantiates the service internally)
+  const { default: InterviewScheduleService } = await import(
+    '../../services/VirtualInterview/interviewScheduleService.js'
+  );
+
+  const originalUpdate = InterviewScheduleService.prototype.update;
+
+  try {
+    InterviewScheduleService.prototype.update = async () => null;
+
+    const server = buildServer({ models: { InterviewSchedule: {} } });
+    await server.ready();
+
+    const scheduleId = new mongoose.Types.ObjectId().toString();
+
+    const res = await server.inject({
+      method: 'PUT',
+      url: `/api/interviewschedules/${scheduleId}`,
+      payload: { any: 'payload' },
+    });
+
+    assert.equal(res.statusCode, 404);
+    const body = res.json();
+    assert.equal(body.error, 'Not found');
+
+    await server.close();
+  } finally {
+    // Always restore
+    InterviewScheduleService.prototype.update = originalUpdate;
+  }
+});

@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1100" viewBox="0 0 1900 1100">
+  <defs>
+    <style>
+      .bg { fill: #1f232a; }
+      .project { fill: #9aa3ad; stroke: #000000; stroke-width: 2; }
+      .region { fill: #d7eaef; stroke: #5ca6ff; stroke-width: 2; stroke-dasharray: 8 8; }
+      .zone { fill: #f1e6df; stroke: #2f9e44; stroke-width: 2; }
+      .subnet { fill: none; stroke: #2a4b8d; stroke-width: 5; stroke-dasharray: 14 24; rx: 18; ry: 18; }
+      .box { fill: #ffffff; stroke: #4a5568; stroke-width: 2; rx: 10; ry: 10; }
+      .node { fill: #ffffff; stroke: #64748b; stroke-width: 2; rx: 8; ry: 8; }
+      .service { fill: #edf7ff; stroke: #2563eb; stroke-width: 2; rx: 8; ry: 8; }
+      .ext { fill: #fff7ed; stroke: #9a3412; stroke-width: 2; rx: 8; ry: 8; }
+      .title { font: 700 20px Arial, sans-serif; fill: #f8fafc; }
+      .label { font: 700 17px Arial, sans-serif; fill: #f8fafc; }
+      .l-dark { font: 700 16px Arial, sans-serif; fill: #0f172a; }
+      .l-blue { font: 700 38px Arial, sans-serif; fill: #0d47a1; }
+      .body { font: 13px Arial, sans-serif; fill: #1f2937; }
+      .body-light { font: 13px Arial, sans-serif; fill: #e2e8f0; }
+      .small { font: 12px Arial, sans-serif; fill: #e2e8f0; }
+      .arrow { stroke: #4b5563; stroke-width: 3; fill: none; marker-end: url(#arr); }
+      .arrow-both { stroke: #4b5563; stroke-width: 3; fill: none; marker-start: url(#arr); marker-end: url(#arr); }
+    </style>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4b5563" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1900" height="1100" class="bg" />
+
+  <!-- Left side: user path -->
+  <rect x="54" y="462" width="108" height="68" class="box" />
+  <text x="108" y="556" text-anchor="middle" class="label">End Users</text>
+
+  <rect x="210" y="460" width="112" height="70" class="box" />
+  <text x="266" y="556" text-anchor="middle" class="label">Client</text>
+  <text x="266" y="582" text-anchor="middle" class="label">Device</text>
+
+  <rect x="370" y="462" width="120" height="68" class="box" />
+  <text x="430" y="556" text-anchor="middle" class="label">Internet</text>
+
+  <path d="M162 496 L210 496" class="arrow-both" />
+  <path d="M322 496 L370 496" class="arrow" />
+  <path d="M490 512 L540 512" class="arrow-both" />
+
+  <!-- Google Cloud Project -->
+  <rect x="540" y="180" width="1270" height="900" class="project" />
+  <text x="612" y="224" class="title">Google Cloud Project</text>
+
+  <!-- Region -->
+  <rect x="632" y="255" width="1120" height="600" class="region" />
+  <text x="704" y="292" class="l-blue" style="font-size:40px;">Region</text>
+
+  <!-- Network gateways inside region -->
+  <rect x="654" y="450" width="150" height="88" class="node" />
+  <text x="729" y="484" text-anchor="middle" class="l-dark">Internet</text>
+  <text x="729" y="508" text-anchor="middle" class="l-dark">Gateway</text>
+
+  <rect x="826" y="450" width="140" height="88" class="node" />
+  <text x="896" y="484" text-anchor="middle" class="l-dark">VPN</text>
+  <text x="896" y="508" text-anchor="middle" class="l-dark">Gateway</text>
+
+  <!-- Zone -->
+  <rect x="930" y="320" width="700" height="360" class="zone" />
+  <text x="1000" y="360" class="l-dark" style="font-size:40px; fill:#2f9e44;">Zone</text>
+
+  <!-- Subnet -->
+  <rect x="1018" y="382" width="540" height="260" class="subnet" />
+  <text x="1308" y="370" text-anchor="middle" class="l-dark">Subnets</text>
+
+  <!-- Firewall and app code -->
+  <rect x="1080" y="450" width="190" height="90" class="service" />
+  <text x="1175" y="487" text-anchor="middle" class="l-dark">VPC Firewall</text>
+  <text x="1175" y="511" text-anchor="middle" class="body">Ingress, WAF, policy</text>
+
+  <rect x="1310" y="440" width="220" height="110" class="service" />
+  <text x="1420" y="476" text-anchor="middle" class="l-dark">Application Code</text>
+  <text x="1420" y="498" text-anchor="middle" class="body">Cloud Run + Fastify</text>
+  <text x="1420" y="518" text-anchor="middle" class="body">API, WS, frontend static</text>
+
+  <!-- Main network flow -->
+  <path d="M804 494 L826 494" class="arrow-both" />
+  <path d="M966 494 L1080 494" class="arrow" />
+  <path d="M1270 494 L1310 494" class="arrow" />
+
+  <!-- Storage -->
+  <rect x="1328" y="730" width="190" height="100" class="service" />
+  <text x="1423" y="768" text-anchor="middle" class="l-dark">Cloud Storage</text>
+  <text x="1423" y="790" text-anchor="middle" class="body">Firebase/GCS bucket</text>
+
+  <path d="M1420 550 L1420 730" class="arrow" />
+
+  <!-- Security / monitoring below project -->
+  <rect x="1120" y="910" width="250" height="110" class="service" />
+  <text x="1245" y="946" text-anchor="middle" class="l-dark">Google Security</text>
+  <text x="1245" y="970" text-anchor="middle" class="l-dark">Command Center</text>
+  <text x="1245" y="992" text-anchor="middle" class="body">posture and alerts</text>
+
+  <rect x="1420" y="910" width="280" height="110" class="service" />
+  <text x="1560" y="946" text-anchor="middle" class="l-dark">Google Cloud Logging</text>
+  <text x="1560" y="970" text-anchor="middle" class="l-dark">Google Cloud Monitoring</text>
+  <text x="1560" y="992" text-anchor="middle" class="body">metrics, logs, traces</text>
+
+  <path d="M1175 680 L1175 910" class="arrow" />
+  <path d="M1420 550 L1420 910" class="arrow" />
+  <path d="M1328 780 L1370 780 L1370 945 L1120 945" class="arrow" />
+
+  <!-- External integrations on right -->
+  <rect x="1650" y="320" width="138" height="430" class="ext" />
+  <text x="1719" y="352" text-anchor="middle" class="l-dark">External</text>
+  <text x="1719" y="372" text-anchor="middle" class="l-dark">Services</text>
+  <text x="1719" y="410" text-anchor="middle" class="body">OpenAI</text>
+  <text x="1719" y="430" text-anchor="middle" class="body">Gemini</text>
+  <text x="1719" y="450" text-anchor="middle" class="body">Claude</text>
+  <text x="1719" y="478" text-anchor="middle" class="body">Deepgram</text>
+  <text x="1719" y="498" text-anchor="middle" class="body">Google STT/TTS</text>
+  <text x="1719" y="526" text-anchor="middle" class="body">Plivo</text>
+  <text x="1719" y="546" text-anchor="middle" class="body">Telnyx</text>
+  <text x="1719" y="574" text-anchor="middle" class="body">WhatsApp API</text>
+  <text x="1719" y="594" text-anchor="middle" class="body">SMTP/Gmail</text>
+  <text x="1719" y="622" text-anchor="middle" class="body">Judge0 CE</text>
+  <text x="1719" y="650" text-anchor="middle" class="body">MongoDB</text>
+
+  <path d="M1530 494 L1650 494" class="arrow-both" />
+
+  <!-- CI/CD -->
+  <rect x="700" y="885" width="170" height="80" class="node" />
+  <text x="785" y="918" text-anchor="middle" class="l-dark">Cloud Build</text>
+  <text x="785" y="940" text-anchor="middle" class="body">build + deploy</text>
+
+  <rect x="900" y="885" width="180" height="80" class="node" />
+  <text x="990" y="918" text-anchor="middle" class="l-dark">Artifact Registry</text>
+  <text x="990" y="940" text-anchor="middle" class="body">image tags</text>
+
+  <path d="M870 925 L900 925" class="arrow" />
+  <path d="M1080 925 L1420 560" class="arrow" />
+
+  <text x="1810" y="1062" text-anchor="end" class="small">
+    Based on live code: backend/server.js, clientDbUtils.js, storageAdapter.js, aiCall routes, cloudbuild.yaml
+  </text>
+</svg>

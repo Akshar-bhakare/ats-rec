@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+    --tech-ink: #0F172A;
+    --tech-muted: #475569;
+    --tech-bg: #F6F8FB;
+    --tech-paper: #FFFFFF;
+    --tech-primary: #2563EB;
+    --tech-primary-soft: #E0ECFF;
+    --tech-cyan: #0EA5E9;
+    --tech-border: #E2E8F0;
+    --tech-shadow: rgba(15, 23, 42, 0.12);
+    --tech-success: #16A34A;
+    --tech-error: #EF4444;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Manrope", "IBM Plex Sans", "Segoe UI", "Helvetica Neue", sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+html,
+body,
+#root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+a {
+    color: var(--tech-primary);
+    text-decoration: none;
+}
+
+img,
+video,
+canvas,
+svg,
+iframe {
+    max-width: 100%;
+    height: auto;
+}

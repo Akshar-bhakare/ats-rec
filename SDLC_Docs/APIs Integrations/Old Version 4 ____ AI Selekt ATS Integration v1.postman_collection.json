@@ -1,0 +1,1091 @@
+{
+  "info": {
+    "_postman_id": "f8d9ea47-61f7-4ba2-86b0-fc1375472af6",
+    "name": "AI Selekt ATS Integration v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "End-to-end collection for the `/ats/integration/v1` onboarding flow covering company, job, candidate, script and AI-call APIs for partner ATS teams."
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Bootstrap session + capture JWT for subsequent requests.",
+      "item": [
+        {
+          "name": "Login (Client Admin / Recruiter)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "description": "Authenticate with tenant credentials to seed the bearer token variable.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo.partner@hirexit.com\",\n  \"password\": \"Passw0rd!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "if (data && data.token) {",
+                  "    pm.globals.set('authToken', data.token);",
+                  "}",
+                  "pm.test('Login succeeded', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Companies",
+      "description": "Company CRUD + archive/unarchive endpoints under `/api/companies/ats/integration/v1`.",
+      "item": [
+        {
+          "name": "Create Company",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/companies/ats/integration/v1",
+            "description": "Creates a company under the tenant (duplicate names per tenant are blocked).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Fintech Labs\",\n  \"industry\": \"Fintech & AI\",\n  \"size\": \"201-500 employees\",\n  \"website\": \"https://careers.acme-fintech.example.com\",\n  \"description\": \"AI-first banking platform simplifying underwriting for SMBs.\",\n  \"logoUrl\": \"https://cdn.example.com/logos/acme-fintech.png\",\n  \"about\": \"Acme Fintech Labs builds risk-intelligence products with human-in-the-loop workflows.\",\n  \"policyBenefits\": \"ESOPs from day one, hybrid allowance, IP buyout.\",\n  \"faqs\": [\n    \"What is the default notice period for new hires?\",\n    \"Do you sponsor relocation to Bengaluru?\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var payload = {};",
+                  "try { payload = pm.response.json(); } catch (e) {}",
+                  "var company = payload && payload.details ? payload.details.company : payload;",
+                  "if (company && company._id) {",
+                  "    pm.globals.set('companyId', company._id);",
+                  "}",
+                  "pm.test('Company created', function () {",
+                  "    pm.expect(company && company._id).to.be.ok;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Companies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/companies/ats/integration/v1?limit=10",
+            "description": "Fetch active companies; supports filters such as ids, fields, viewMode etc."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Company By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/companies/ats/integration/v1/{{companyId}}",
+            "description": "Returns the stored company profile by id."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Company",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/companies/ats/integration/v1/{{companyId}}",
+            "description": "Partial update for the existing company record.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated positioning for the India GTM team.\",\n  \"policyBenefits\": \"WFH setup stipend, quarterly wellbeing allowance\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Company (Archive)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/companies/ats/integration/v1/{{companyId}}",
+            "description": "Soft deletes / archives the company (204 No Content on success)."
+          },
+          "response": []
+        },
+        {
+          "name": "Unarchive Company",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/companies/ats/integration/v1/{{companyId}}/unarchive",
+            "description": "Restores a previously archived company so jobs/candidates can link to it again.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "description": "Job CRUD + AI job description helper endpoints.",
+      "item": [
+        {
+          "name": "Generate Job Description (AI)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/jobs/ats/integration/v1/generate-JobDescription",
+            "description": "Invokes the AI JD generator; returns { success, jobDescription } using the supplied attributes.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"AI Customer Success Manager\",\n  \"skills\": [\n    \"Customer Success\",\n    \"AI Adoption\",\n    \"SQL\"\n  ],\n  \"experience\": {\n    \"min\": 5,\n    \"max\": 8\n  },\n  \"locations\": [\n    \"Bengaluru\"\n  ],\n  \"salary\": {\n    \"min\": 1500000,\n    \"max\": 2300000,\n    \"currency\": \"INR\"\n  },\n  \"workMode\": \"Hybrid\",\n  \"educationDetails\": [\n    {\n      \"level\": \"Bachelor\",\n      \"qualification\": [\n        \"B.E\"\n      ],\n      \"streamOrSpecialization\": \"Computer Science\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let result = {};",
+                  "try { result = pm.response.json() || {}; } catch (e) {}",
+                  "let jobDescObj = result.jobDescription || (result.details && result.details.jobDescription) || null;",
+                  "let finalText = '';",
+                  "if (typeof jobDescObj === 'string') {",
+                  "    finalText = jobDescObj;",
+                  "} else if (jobDescObj && typeof jobDescObj === 'object') {",
+                  "    const overview = jobDescObj.overview || '';",
+                  "    const responsibilities = Array.isArray(jobDescObj.responsibilities) ? jobDescObj.responsibilities : [];",
+                  "    const requirements = Array.isArray(jobDescObj.requirements) ? jobDescObj.requirements : [];",
+                  "    const benefits = Array.isArray(jobDescObj.benefits) ? jobDescObj.benefits : [];",
+                  "    const full = [",
+                  "        overview,",
+                  "        responsibilities.length ? 'Responsibilities:\\n' + responsibilities.join('\\n') : '',",
+                  "        requirements.length ? 'Requirements:\\n' + requirements.join('\\n') : '',",
+                  "        benefits.length ? 'Benefits:\\n' + benefits.join('\\n') : ''",
+                  "    ].filter(Boolean).join('\\n\\n');",
+                  "    finalText = full && full.trim() ? full : '';",
+                  "}",
+                  "if (!finalText) {",
+                  "    finalText = 'a dummy description';",
+                  "}",
+                  "pm.globals.set('jobDescription', finalText);",
+                  "pm.test('JD generated', function () {",
+                  "    pm.expect(finalText).to.be.ok;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/jobs/ats/integration/v1",
+            "description": "Creates a job opening tied to the selected company.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"AI Customer Success Manager\",\n  \"internalTitle\": \"CSM-AI-2025\",\n  \"jobType\": \"Full-time\",\n  \"locations\": [\n    \"Bengaluru\",\n    \"Remote\"\n  ],\n  \"salary\": {\n    \"min\": 1500000,\n    \"max\": 2500000,\n    \"currency\": \"INR\"\n  },\n  \"experience\": {\n    \"min\": 5,\n    \"max\": 8\n  },\n  \"workMode\": \"Hybrid\",\n  \"hybridDetails\": \"3 days in Bengaluru HQ, 2 days remote.\",\n  \"educationDetails\": [\n    {\n      \"level\": \"Bachelor\",\n      \"qualification\": [\n        \"B.E\",\n        \"B.Tech\"\n      ],\n      \"streamOrSpecialization\": \"Computer Science\"\n    }\n  ],\n  \"certifications\": [\n    \"PMP\",\n    \"AWS CCP\"\n  ],\n  \"positions\": 2,\n  \"primarySkills\": [\n    \"B2B SaaS\",\n    \"Customer Success\",\n    \"AI Adoption\"\n  ],\n  \"secondarySkills\": [\n    \"SQL\",\n    \"Looker Studio\"\n  ],\n  \"description\": \"{{jobDescription}}\",\n  \"shortDescription\": \"AI-led CS leader role\",\n  \"recruiterNotes\": \"Prior SaaS onboarding experience is a must.\",\n  \"enableAICall\": true,\n  \"isWalkIn\": false,\n  \"company\": \"{{companyId}}\",\n  \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var job = {};",
+                  "try { job = pm.response.json(); } catch (e) {}",
+                  "if (job && job._id) {",
+                  "    pm.globals.set('jobId', job._id);",
+                  "}",
+                  "pm.test('Job created', function () {",
+                  "    pm.expect(job && job._id).to.be.ok;",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jd = pm.globals.get('jobDescription');",
+                  "if (!jd || !jd.trim()) {",
+                  "    jd = 'a dummy description';",
+                  "    pm.globals.set('jobDescription', jd);",
+                  "}",
+                  "pm.variables.set('jobDescription', jd);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Jobs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/jobs/ats/integration/v1?limit=25&status=active",
+            "description": "Retrieve paginated jobs (supports filters like company, status, viewMode, fields, limit)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Job By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/jobs/ats/integration/v1/{{jobId}}",
+            "description": "Returns the full job document including company relation."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Job",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/jobs/ats/integration/v1/{{jobId}}",
+            "description": "Applies partial changes to the job.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"primarySkills\": [\n    \"Customer Success Strategy\",\n    \"CS Operations\",\n    \"AI Adoption\"\n  ],\n  \"secondarySkills\": [\n    \"SQL\",\n    \"Looker Studio\",\n    \"Notion\"\n  ],\n  \"shortDescription\": \"Updated scope with CS automation charter\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Job (Archive)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/jobs/ats/integration/v1/{{jobId}}",
+            "description": "Archives the job posting."
+          },
+          "response": []
+        },
+        {
+          "name": "Unarchive Job",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/jobs/ats/integration/v1/{{jobId}}/unarchive",
+            "description": "Restores an archived job back to the active pool.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Candidates",
+      "description": "Candidate CRUD, multipart update, job assignment and archive/unarchive endpoints.",
+      "item": [
+        {
+          "name": "Create Candidate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/candidates/ats/integration/v1",
+            "description": "Creates a candidate profile with at least one linked job so ATS state can build.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Ishita\",\n  \"lastName\": \"Singh\",\n  \"email\": \"ishita.singh+atsdemo@samplemail.com\",\n  \"countryCode\": \"+91\",\n  \"phoneNumber\": \"9876523410\",\n  \"panCardNumber\": \"ABCDE1234F\",\n  \"skills\": [\n    {\n      \"name\": \"Customer Success\",\n      \"experience\": \"6 years\"\n    },\n    {\n      \"name\": \"AI Implementations\",\n      \"experience\": \"3 years\"\n    }\n  ],\n  \"resumeUrl\": \"https://cdn.example.com/resumes/ishita-singh.pdf\",\n  \"resumeText\": \"Customer success lead owning AI rollouts across 40 enterprise accounts.\",\n  \"jobs\": [\n    \"{{jobId}}\"\n  ],\n  \"applications\": [],\n  \"sourcePlatform\": \"Partner ATS\",\n  \"sourceExtraInfo\": \"Synced from Demo ATS instance\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var candidate = {};",
+                  "try { candidate = pm.response.json(); } catch (e) {}",
+                  "if (candidate && candidate._id) {",
+                  "    pm.globals.set('candidateId', candidate._id);",
+                  "}",
+                  "pm.test('Candidate created', function () {",
+                  "    pm.expect(candidate && candidate._id).to.be.ok;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Candidates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/candidates/ats/integration/v1?limit=20&isArchived=false",
+            "description": "Returns active candidates; accepts filters such as ids, fields, viewMode, isArchived."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Candidate By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/candidates/ats/integration/v1/{{candidateId}}",
+            "description": "Full profile lookup, including jobs and applications."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Candidate Profile (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/candidates/ats/integration/v1/{{candidateId}}",
+            "description": "Multipart endpoint used to edit candidate attributes or upload a new resume (attach file using field `resumes`).",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "firstName",
+                  "value": "Ishita",
+                  "type": "text"
+                },
+                {
+                  "key": "lastName",
+                  "value": "Singh",
+                  "type": "text"
+                },
+                {
+                  "key": "countryCode",
+                  "value": "+91",
+                  "type": "text"
+                },
+                {
+                  "key": "phoneNumber",
+                  "value": "9876500012",
+                  "type": "text"
+                },
+                {
+                  "key": "skills",
+                  "value": "Customer Success Strategy, AI Automation, SQL",
+                  "type": "text"
+                },
+                {
+                  "key": "sourcePlatform",
+                  "value": "Partner ATS",
+                  "type": "text"
+                },
+                {
+                  "key": "sourceExtraInfo",
+                  "value": "Updated from ATS sync on 10 Feb",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Candidate To Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/candidates/ats/integration/v1/assign-job",
+            "description": "Ensures a CandidateATS application exists with initialized stage results.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"candidateIds\": [\n    \"{{candidateId}}\"\n  ],\n  \"jobIds\": [\n    \"{{jobId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Candidate (Archive)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/candidates/ats/integration/v1/{{candidateId}}",
+            "description": "Archives the candidate profile."
+          },
+          "response": []
+        },
+        {
+          "name": "Unarchive Candidate",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/candidates/ats/integration/v1/{{candidateId}}/unarchive",
+            "description": "Restores a previously archived candidate.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ATS Snapshot & Conversations",
+      "description": "Helper endpoints to inspect CandidateATS stage data and transcripts.",
+      "item": [
+        {
+          "name": "List Candidate ATS View",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/candidates/ats",
+            "description": "Returns candidates + applications (CandidateATS records) like the recruiter UI grid."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var candidateId = pm.globals.get('candidateId');",
+                  "var data = [];",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "var match;",
+                  "if (Array.isArray(data)) {",
+                  "    data.forEach(function (cand) {",
+                  "        if (match) { return; }",
+                  "        var cid = cand && (cand._id || cand.id);",
+                  "        if (cid && candidateId && cid === candidateId) {",
+                  "            match = cand;",
+                  "        }",
+                  "    });",
+                  "}",
+                  "if (match && Array.isArray(match.applications) && match.applications.length) {",
+                  "    var atsId = match.applications[0] && (match.applications[0]._id || match.applications[0].id);",
+                  "    if (atsId) {",
+                  "        pm.globals.set('atsId', atsId);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Candidate ATS Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/candidates/ats/{{atsId}}?fields=stageResults",
+            "description": "Loads a single CandidateATS record with ordered stage results."
+          },
+          "response": []
+        },
+        {
+          "name": "Fetch AI Conversation Transcript",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/conversations/ats/integration/v1?candidateId={{candidateId}}&jobId={{jobId}}",
+            "description": "Pull the AI call + WhatsApp transcript filtered by candidate/job for auditing."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Scripts",
+      "description": "Script CRUD plus AI-powered generation and TTS voice discovery.",
+      "item": [
+        {
+          "name": "Create Script",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/scripts/ats/integration/v1",
+            "description": "Creates a voice/script asset for the given job. One script per job is enforced.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": \"{{jobId}}\",\n  \"scriptName\": \"AI Screening Script - CSM\",\n  \"scriptType\": \"AI_CALL\",\n  \"extraQuestion\": \"Why do you enjoy working with AI-first customer teams?\",\n  \"content\": \"{{scriptContent}}\",\n  \"language\": \"en-US\",\n  \"gender\": \"female\",\n  \"voiceModel\": \"en-US-Neural2-F\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var scriptDoc = {};",
+                  "try { scriptDoc = pm.response.json(); } catch (e) {}",
+                  "if (scriptDoc && scriptDoc._id) {",
+                  "    pm.globals.set('scriptId', scriptDoc._id);",
+                  "}",
+                  "pm.test('Script created', function () {",
+                  "    pm.expect(scriptDoc && scriptDoc._id).to.be.ok;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Scripts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/scripts/ats/integration/v1?jobId={{jobId}}",
+            "description": "Lists scripts (optionally filtered by job)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Script By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/scripts/ats/integration/v1/{{scriptId}}",
+            "description": "Fetches a single script document."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Script",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/scripts/ats/integration/v1/{{scriptId}}",
+            "description": "Update script content/metadata (jobId cannot change).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"extraQuestion\": \"Tell us about a time you recovered a churn-risk account.\",\n  \"content\": \"Hello again {{candidate_first_name}}, let's double-click on your CS wins...\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Script",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/scripts/ats/integration/v1/{{scriptId}}",
+            "description": "Deletes the script record (freeing the job to create a new one)."
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Script via AI",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/scripts/ats/integration/v1/generate-script",
+            "description": "Uses the AI helper to craft a phone script using the job/candidate context.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": \"{{jobId}}\",\n  \"extraQuestion\": \"Share a win where you drove AI adoption\",\n  \"candidateId\": \"{{candidateId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Languages & Voices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/scripts/ats/integration/v1/languages-voices",
+            "description": "Proxies Google TTS voices so you can pick a locale/gender pair for script narration."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "AI Calls",
+      "description": "Scheduling + immediate trigger endpoints for the AI screening service.",
+      "item": [
+        {
+          "name": "Schedule AI Call",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/ai/call/ats/integration/v1/schedule/",
+            "description": "Queues an AI call for the given candidate/job pair (respects IST calling window + credits).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scheduleTime\": \"{{scheduleTimeISO}}\",\n  \"candidates\": [\n    {\n      \"_id\": \"{{candidateId}}\",\n      \"jobId\": \"{{jobId}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Candidate Schedule",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/ai/call/ats/integration/v1/schedule/?candidate={{candidateId}}&job={{jobId}}",
+            "description": "Returns any upcoming schedules with status + error info if previous executions failed."
+          },
+          "response": []
+        },
+        {
+          "name": "Trigger AI Call Now",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/ai/call/ats/integration/v1/trigger/plivo/{{candidateId}}/{{jobId}}/",
+            "description": "Immediately triggers the Plivo AI call (candidate must be in calling hours)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var data = {};",
+                  "try { data = pm.response.json(); } catch (e) {}",
+                  "if (data && data.details && data.details.callUUID) {",
+                  "    pm.globals.set('callUUID', data.details.callUUID);",
+                  "}",
+                  "pm.test('AI call trigger accepted', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.your-tenant.aiselekt.com",
+      "type": "string",
+      "description": "Backend origin, e.g. https://api.dev.aiselekt.com"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT from the login call"
+    },
+    {
+      "key": "companyId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "jobId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "candidateId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "atsId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "scriptId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "callUUID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "scheduleTimeISO",
+      "value": "2025-02-10T11:30:00.000Z",
+      "type": "string",
+      "description": "ISO8601 slot used for call scheduling"
+    },
+    {
+      "key": "jobDescription",
+      "value": "a dummy description",
+      "type": "string",
+      "description": "Stores the AI-generated JD; defaults to a placeholder until generated."
+    },
+    {
+      "key": "scriptContent",
+      "value": "Hello {{candidate_first_name}}, this is the AI recruiter calling from Acme Fintech Labs to discuss the AI Customer Success Manager role.",
+      "type": "string",
+      "description": "Reusable script content placeholder; update after using the AI generator if needed."
+    }
+  ]
+}

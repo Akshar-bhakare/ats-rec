@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1250" viewBox="0 0 1900 1250">
+  <defs>
+    <style>
+      .title { font: 700 30px Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 16px Arial, sans-serif; fill: #334155; }
+      .boundary { fill: #f8fafc; stroke: #94a3b8; stroke-width: 2; }
+      .box { fill: #ffffff; stroke: #334155; stroke-width: 2; rx: 10; ry: 10; }
+      .ext { fill: #fff7ed; stroke: #9a3412; stroke-width: 2; rx: 10; ry: 10; }
+      .data { fill: #ecfeff; stroke: #0e7490; stroke-width: 2; rx: 10; ry: 10; }
+      .cicd { fill: #eff6ff; stroke: #1d4ed8; stroke-width: 2; rx: 10; ry: 10; }
+      .label { font: 700 16px Arial, sans-serif; fill: #0f172a; }
+      .body { font: 13px Arial, sans-serif; fill: #1e293b; }
+      .small { font: 12px Arial, sans-serif; fill: #475569; }
+      .arrow { stroke: #334155; stroke-width: 2.2; fill: none; marker-end: url(#arrowhead); }
+      .arrow-both { stroke: #334155; stroke-width: 2.2; fill: none; marker-start: url(#arrowhead); marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#334155" />
+    </marker>
+  </defs>
+
+  <text x="950" y="42" text-anchor="middle" class="title">Hirexit System Architecture Diagram</text>
+  <text x="950" y="68" text-anchor="middle" class="subtitle">Sprinto Evidence Version - Generated from current workspace code</text>
+
+  <!-- Actors -->
+  <rect x="30" y="150" width="230" height="120" class="box" />
+  <text x="145" y="178" text-anchor="middle" class="label">Internal Users</text>
+  <text x="145" y="205" text-anchor="middle" class="body">Ultra Admin</text>
+  <text x="145" y="223" text-anchor="middle" class="body">Client Admin, Recruiter</text>
+  <text x="145" y="241" text-anchor="middle" class="body">Interviewer</text>
+
+  <rect x="30" y="320" width="230" height="120" class="box" />
+  <text x="145" y="348" text-anchor="middle" class="label">Candidates (Web)</text>
+  <text x="145" y="375" text-anchor="middle" class="body">Portal Access</text>
+  <text x="145" y="393" text-anchor="middle" class="body">Interview Links</text>
+  <text x="145" y="411" text-anchor="middle" class="body">Forms and Uploads</text>
+
+  <rect x="30" y="490" width="230" height="120" class="box" />
+  <text x="145" y="518" text-anchor="middle" class="label">Candidates (Phone)</text>
+  <text x="145" y="545" text-anchor="middle" class="body">AI Voice Calls</text>
+  <text x="145" y="563" text-anchor="middle" class="body">WhatsApp Messages</text>
+  <text x="145" y="581" text-anchor="middle" class="body">SMS style workflows</text>
+
+  <!-- Runtime Boundary -->
+  <rect x="300" y="100" width="850" height="760" class="boundary" />
+  <text x="725" y="132" text-anchor="middle" class="label">Application Runtime Boundary (Cloud Run Service)</text>
+
+  <rect x="340" y="165" width="340" height="130" class="box" />
+  <text x="510" y="194" text-anchor="middle" class="label">Frontend</text>
+  <text x="510" y="220" text-anchor="middle" class="body">React + Vite SPA</text>
+  <text x="510" y="238" text-anchor="middle" class="body">served by Fastify static plugin</text>
+  <text x="510" y="256" text-anchor="middle" class="body">uses /api and WebSocket endpoints</text>
+
+  <rect x="720" y="165" width="390" height="170" class="box" />
+  <text x="915" y="194" text-anchor="middle" class="label">Backend Gateway</text>
+  <text x="915" y="220" text-anchor="middle" class="body">Fastify REST + WebSocket routes</text>
+  <text x="915" y="238" text-anchor="middle" class="body">JWT, session+CSRF, RBAC</text>
+  <text x="915" y="256" text-anchor="middle" class="body">tenant DB resolution per request</text>
+  <text x="915" y="274" text-anchor="middle" class="body">ATS integration endpoints (v1 paths)</text>
+  <text x="915" y="292" text-anchor="middle" class="body">schedules/background bootstrap</text>
+
+  <rect x="340" y="350" width="770" height="260" class="box" />
+  <text x="725" y="380" text-anchor="middle" class="label">Core Business Modules</text>
+  <text x="360" y="410" class="body">- Auth, users, admins, recruiters, companies, jobs, candidates, stages, scripts</text>
+  <text x="360" y="432" class="body">- AI calling orchestration and provider routing (Plivo/Telnyx)</text>
+  <text x="360" y="454" class="body">- Virtual interview services (WebRTC room, scheduling, recording)</text>
+  <text x="360" y="476" class="body">- Conversation and notification modules, dashboard and assistant routes</text>
+  <text x="360" y="498" class="body">- Email template and unsubscribe flows, WhatsApp webhook handling</text>
+  <text x="360" y="520" class="body">- Relevancy and embedding workflows for candidate-job matching</text>
+  <text x="360" y="542" class="body">- Code Judge adapter routes for coding evaluations (Judge0)</text>
+  <text x="360" y="564" class="small">Implemented under backend/src/routes, backend/src/services, backend/src/utils</text>
+
+  <rect x="340" y="635" width="370" height="95" class="box" />
+  <text x="525" y="664" text-anchor="middle" class="label">Scheduler Jobs</text>
+  <text x="525" y="690" text-anchor="middle" class="body">timeOutSetterForSchedulersAfterDeploy()</text>
+  <text x="525" y="708" text-anchor="middle" class="body">call/interview periodic checks</text>
+
+  <rect x="740" y="635" width="370" height="95" class="box" />
+  <text x="925" y="664" text-anchor="middle" class="label">Storage Adapters</text>
+  <text x="925" y="690" text-anchor="middle" class="body">Firebase Storage (default)</text>
+  <text x="925" y="708" text-anchor="middle" class="body">or GCS emulator in local mode</text>
+
+  <!-- External Integrations -->
+  <rect x="1230" y="140" width="300" height="95" class="ext" />
+  <text x="1380" y="168" text-anchor="middle" class="label">LLM Providers</text>
+  <text x="1380" y="194" text-anchor="middle" class="body">OpenAI, Gemini, Claude</text>
+  <text x="1380" y="212" text-anchor="middle" class="body">chat + embeddings + TTS</text>
+
+  <rect x="1230" y="255" width="300" height="95" class="ext" />
+  <text x="1380" y="283" text-anchor="middle" class="label">Speech Services</text>
+  <text x="1380" y="309" text-anchor="middle" class="body">Deepgram STT</text>
+  <text x="1380" y="327" text-anchor="middle" class="body">Google Speech/TTS</text>
+
+  <rect x="1230" y="370" width="300" height="95" class="ext" />
+  <text x="1380" y="398" text-anchor="middle" class="label">Telephony</text>
+  <text x="1380" y="424" text-anchor="middle" class="body">Plivo and Telnyx</text>
+  <text x="1380" y="442" text-anchor="middle" class="body">voice and media streaming</text>
+
+  <rect x="1230" y="485" width="300" height="95" class="ext" />
+  <text x="1380" y="513" text-anchor="middle" class="label">WhatsApp Cloud API</text>
+  <text x="1380" y="539" text-anchor="middle" class="body">inbound webhook + outbound sends</text>
+  <text x="1380" y="557" text-anchor="middle" class="body">template and text messages</text>
+
+  <rect x="1230" y="600" width="300" height="95" class="ext" />
+  <text x="1380" y="628" text-anchor="middle" class="label">Email Providers</text>
+  <text x="1380" y="654" text-anchor="middle" class="body">Gmail OAuth2</text>
+  <text x="1380" y="672" text-anchor="middle" class="body">Custom SMTP</text>
+
+  <rect x="1230" y="715" width="300" height="95" class="ext" />
+  <text x="1380" y="743" text-anchor="middle" class="label">Code Execution</text>
+  <text x="1380" y="769" text-anchor="middle" class="body">Judge0 CE API</text>
+  <text x="1380" y="787" text-anchor="middle" class="body">polled by execution adapter</text>
+
+  <rect x="1230" y="830" width="300" height="95" class="ext" />
+  <text x="1380" y="858" text-anchor="middle" class="label">Frontend Maps API</text>
+  <text x="1380" y="884" text-anchor="middle" class="body">Google Maps Places</text>
+  <text x="1380" y="902" text-anchor="middle" class="body">autocomplete for jobs/locations</text>
+
+  <!-- Data Layer -->
+  <rect x="300" y="890" width="850" height="180" class="boundary" />
+  <text x="725" y="920" text-anchor="middle" class="label">Data and State Layer</text>
+
+  <rect x="330" y="940" width="250" height="110" class="data" />
+  <text x="455" y="968" text-anchor="middle" class="label">MongoDB</text>
+  <text x="455" y="994" text-anchor="middle" class="body">DEFAULT_DB metadata</text>
+  <text x="455" y="1012" text-anchor="middle" class="body">Per-tenant operational DBs</text>
+  <text x="455" y="1030" text-anchor="middle" class="body">Mongoose model registry</text>
+
+  <rect x="600" y="940" width="250" height="110" class="data" />
+  <text x="725" y="968" text-anchor="middle" class="label">Object Storage</text>
+  <text x="725" y="994" text-anchor="middle" class="body">Firebase bucket (default)</text>
+  <text x="725" y="1012" text-anchor="middle" class="body">recordings, resumes, audio</text>
+  <text x="725" y="1030" text-anchor="middle" class="body">signed URL retrieval</text>
+
+  <rect x="870" y="940" width="250" height="110" class="data" />
+  <text x="995" y="968" text-anchor="middle" class="label">Ephemeral Local Storage</text>
+  <text x="995" y="994" text-anchor="middle" class="body">AiSelektTmpMedia</text>
+  <text x="995" y="1012" text-anchor="middle" class="body">temp upload and TTS cache</text>
+  <text x="995" y="1030" text-anchor="middle" class="body">server runtime filesystem</text>
+
+  <!-- CI/CD -->
+  <rect x="300" y="1095" width="270" height="110" class="cicd" />
+  <text x="435" y="1123" text-anchor="middle" class="label">Cloud Build</text>
+  <text x="435" y="1149" text-anchor="middle" class="body">docker build + push</text>
+  <text x="435" y="1167" text-anchor="middle" class="body">service update command</text>
+
+  <rect x="600" y="1095" width="270" height="110" class="cicd" />
+  <text x="735" y="1123" text-anchor="middle" class="label">Artifact Registry</text>
+  <text x="735" y="1149" text-anchor="middle" class="body">commit SHA tag</text>
+  <text x="735" y="1167" text-anchor="middle" class="body">latest tag</text>
+
+  <!-- Connections -->
+  <path d="M260 210 L340 210" class="arrow-both" />
+  <path d="M260 380 L340 245" class="arrow-both" />
+  <path d="M260 550 L1230 420" class="arrow-both" />
+  <path d="M260 550 L1230 530" class="arrow-both" />
+
+  <path d="M680 230 L720 230" class="arrow-both" />
+
+  <path d="M915 335 L455 940" class="arrow" />
+  <path d="M930 335 L725 940" class="arrow" />
+  <path d="M945 335 L995 940" class="arrow" />
+
+  <path d="M1110 220 L1230 185" class="arrow-both" />
+  <path d="M1110 250 L1230 300" class="arrow-both" />
+  <path d="M1110 280 L1230 415" class="arrow-both" />
+  <path d="M1110 300 L1230 530" class="arrow-both" />
+  <path d="M1110 320 L1230 645" class="arrow-both" />
+  <path d="M1110 330 L1230 760" class="arrow-both" />
+  <path d="M680 195 L1230 875" class="arrow" />
+
+  <path d="M435 1095 L455 1050" class="arrow" />
+  <path d="M570 1150 L600 1150" class="arrow" />
+  <path d="M870 1150 L980 830" class="arrow" />
+
+  <text x="1700" y="1210" text-anchor="end" class="small">
+    Evidence source: backend/server.js, backend/src/utils/*, backend/src/routes/*, backend/cloudbuild.yaml
+  </text>
+</svg>

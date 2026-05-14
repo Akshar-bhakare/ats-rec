@@ -1,0 +1,24 @@
+{
+    "files.autoSave": "onFocusChange",
+    "editor.minimap.enabled": false,
+    "workbench.iconTheme": "vscode-icons",
+    "editor.autoClosingBrackets": "always",
+    "window.confirmBeforeClose": "always",
+    "debug.confirmOnExit": "always",
+    "terminal.integrated.confirmOnExit": "always",
+    "terminal.integrated.confirmOnKill": "always",
+    "screencastMode.fontSize": 20,
+    "editor.formatOnSave": true,
+    "echoapi.documentServicePort": 3252,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "chat.instructionsFilesLocations": {
+        ".github/instructions": true
+    },
+    "terminal.integrated.suggest.enabled": false,
+    "editor.unicodeHighlight.nonBasicASCII": false,
+    "editor.unicodeHighlight.invisibleCharacters": false,
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "[javascriptreact]": {
+        "editor.tabSize": 4
+    }
+}

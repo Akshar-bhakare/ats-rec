@@ -1,0 +1,1 @@
+const a=/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/;function t(e){return e?e.length<8?{valid:!1,message:"Password must be at least 8 characters long."}:a.test(e)?{valid:!0,message:""}:{valid:!1,message:"Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character."}:{valid:!1,message:""}}export{t as v};

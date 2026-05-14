@@ -1,0 +1,13 @@
+Why C fails
+
+Your C fullSource likely contains non-UTF8 bytes (usually from:
+
+a hidden character (smart quotes, zero-width chars)
+
+Windows CRLF + some copy/paste artifact
+
+or your harness has characters Judge0 can’t decode)
+
+In practice with Judge0 CE, the most reliable fix is:
+
+✅ Send source_code + stdin as base64, and set base64_encoded=true.

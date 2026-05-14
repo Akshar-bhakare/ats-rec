@@ -1,0 +1,1200 @@
+{
+    "tier_1_colleges": [
+        {
+            "sr_no": 1,
+            "institute": "Indian Institute of Technology Madras",
+            "city": "Chennai",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 2,
+            "institute": "Indian Institute of Technology Delhi",
+            "city": "New Delhi",
+            "state": "Delhi"
+        },
+        {
+            "sr_no": 3,
+            "institute": "Indian Institute of Technology Bombay",
+            "city": "Mumbai",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 4,
+            "institute": "Indian Institute of Technology Kanpur",
+            "city": "Kanpur",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 5,
+            "institute": "Indian Institute of Technology Kharagpur",
+            "city": "Kharagpur",
+            "state": "West Bengal"
+        },
+        {
+            "sr_no": 6,
+            "institute": "Indian Institute of Technology Roorkee",
+            "city": "Roorkee",
+            "state": "Uttarakhand"
+        },
+        {
+            "sr_no": 7,
+            "institute": "Indian Institute of Technology Guwahati",
+            "city": "Guwahati",
+            "state": "Assam"
+        },
+        {
+            "sr_no": 8,
+            "institute": "Indian Institute of Technology Hyderabad",
+            "city": "Hyderabad",
+            "state": "Telangana"
+        },
+        {
+            "sr_no": 9,
+            "institute": "National Institute of Technology Tiruchirappalli",
+            "city": "Tiruchirappalli",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 10,
+            "institute": "Indian Institute of Technology (Banaras Hindu University) Varanasi",
+            "city": "Varanasi",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 11,
+            "institute": "Vellore Institute of Technology",
+            "city": "Vellore",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 12,
+            "institute": "Jadavpur University",
+            "city": "Kolkata",
+            "state": "West Bengal"
+        },
+        {
+            "sr_no": 13,
+            "institute": "S.R.M. Institute of Science and Technology",
+            "city": "Chennai",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 14,
+            "institute": "Anna University",
+            "city": "Chennai",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 15,
+            "institute": "Indian Institute of Technology (Indian School of Mines) Dhanbad",
+            "city": "Dhanbad",
+            "state": "Jharkhand"
+        },
+        {
+            "sr_no": 16,
+            "institute": "Indian Institute of Technology Indore",
+            "city": "Indore",
+            "state": "Madhya Pradesh"
+        },
+        {
+            "sr_no": 17,
+            "institute": "National Institute of Technology Karnataka, Surathkal",
+            "city": "Surathkal",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 18,
+            "institute": "Indian Institute of Technology Gandhinagar",
+            "city": "Gandhinagar",
+            "state": "Gujarat"
+        },
+        {
+            "sr_no": 19,
+            "institute": "National Institute of Technology Rourkela",
+            "city": "Rourkela",
+            "state": "Odisha"
+        },
+        {
+            "sr_no": 20,
+            "institute": "Birla Institute of Technology and Science, Pilani",
+            "city": "Pilani",
+            "state": "Rajasthan"
+        },
+        {
+            "sr_no": 21,
+            "institute": "National Institute of Technology Warangal",
+            "city": "Warangal",
+            "state": "Telangana"
+        },
+        {
+            "sr_no": 22,
+            "institute": "Indian Institute of Technology Ropar",
+            "city": "Rupnagar",
+            "state": "Punjab"
+        },
+        {
+            "sr_no": 23,
+            "institute": "Amrita Vishwa Vidyapeetham",
+            "city": "Coimbatore",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 24,
+            "institute": "Jamia Millia Islamia",
+            "city": "New Delhi",
+            "state": "Delhi"
+        },
+        {
+            "sr_no": 25,
+            "institute": "National Institute of Technology Calicut",
+            "city": "Kozhikode",
+            "state": "Kerala"
+        },
+        {
+            "sr_no": 26,
+            "institute": "Siksha `O` Anusandhan",
+            "city": "Bhubaneswar",
+            "state": "Odisha"
+        },
+        {
+            "sr_no": 27,
+            "institute": "Delhi Technological University",
+            "city": "New Delhi",
+            "state": "Delhi"
+        },
+        {
+            "sr_no": 28,
+            "institute": "Indian Institute of Technology Jodhpur",
+            "city": "Jodhpur",
+            "state": "Rajasthan"
+        },
+        {
+            "sr_no": 29,
+            "institute": "Thapar Institute of Engineering and Technology (Deemed-to-be-university)",
+            "city": "Patiala",
+            "state": "Punjab"
+        },
+        {
+            "sr_no": 30,
+            "institute": "Amity University",
+            "city": "Gautam Budh Nagar",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 31,
+            "institute": "Indian Institute of Technology Mandi",
+            "city": "Mandi",
+            "state": "Himachal Pradesh"
+        },
+        {
+            "sr_no": 32,
+            "institute": "Chandigarh University",
+            "city": "Mohali",
+            "state": "Punjab"
+        },
+        {
+            "sr_no": 33,
+            "institute": "Aligarh Muslim University",
+            "city": "Aligarh",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 34,
+            "institute": "Indian Institute of Technology Patna",
+            "city": "Patna",
+            "state": "Bihar"
+        },
+        {
+            "sr_no": 35,
+            "institute": "Koneru Lakshmaiah Education Foundation University (K L College of Engineering)",
+            "city": "Vaddeswaram",
+            "state": "Andhra Pradesh"
+        },
+        {
+            "sr_no": 36,
+            "institute": "Kalasalingam Academy of Research and Education",
+            "city": "Srivilliputhur",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 37,
+            "institute": "Kalinga Institute of Industrial Technology",
+            "city": "Bhubaneswar",
+            "state": "Odisha"
+        },
+        {
+            "sr_no": 38,
+            "institute": "Shanmugha Arts Science Technology and Research Academy",
+            "city": "Thanjavur",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 39,
+            "institute": "Visvesvaraya National Institute of Technology Nagpur",
+            "city": "Nagpur",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 40,
+            "institute": "National Institute of Technology Silchar",
+            "city": "Silchar",
+            "state": "Assam"
+        },
+        {
+            "sr_no": 41,
+            "institute": "Institute of Chemical Technology",
+            "city": "Mumbai",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 42,
+            "institute": "UPES",
+            "city": "Dehradun",
+            "state": "Uttarakhand"
+        },
+        {
+            "sr_no": 43,
+            "institute": "Malaviya National Institute of Technology",
+            "city": "Jaipur",
+            "state": "Rajasthan"
+        },
+        {
+            "sr_no": 44,
+            "institute": "National Institute of Technology Durgapur",
+            "city": "Durgapur",
+            "state": "West Bengal"
+        },
+        {
+            "sr_no": 45,
+            "institute": "National Institute of Technology Delhi",
+            "city": "Delhi",
+            "state": "Delhi"
+        },
+        {
+            "sr_no": 46,
+            "institute": "Sri Sivasubramaniya Nadar College of Engineering",
+            "city": "Kalavakkam",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 47,
+            "institute": "International Institute of Information Technology Hyderabad",
+            "city": "Hyderabad",
+            "state": "Telangana"
+        },
+        {
+            "sr_no": 48,
+            "institute": "Birla Institute of Technology",
+            "city": "Ranchi",
+            "state": "Jharkhand"
+        },
+        {
+            "sr_no": 49,
+            "institute": "Indian Institute of Engineering Science and Technology, Shibpur",
+            "city": "Howrah",
+            "state": "West Bengal"
+        },
+        {
+            "sr_no": 50,
+            "institute": "Lovely Professional University",
+            "city": "Phagwara",
+            "state": "Punjab"
+        },
+        {
+            "sr_no": 51,
+            "institute": "Indian Institute of Space Science and Technology",
+            "city": "Thiruvananthapuram",
+            "state": "Kerala"
+        },
+        {
+            "sr_no": 52,
+            "institute": "Graphic Era University",
+            "city": "Dehradun",
+            "state": "Uttarakhand"
+        },
+        {
+            "sr_no": 53,
+            "institute": "Saveetha Institute of Medical and Technical Sciences",
+            "city": "Chennai",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 54,
+            "institute": "Indian Institute of Technology Bhubaneswar",
+            "city": "Bhubaneswar",
+            "state": "Odisha"
+        },
+        {
+            "sr_no": 55,
+            "institute": "National Institute of Technology Patna",
+            "city": "Patna",
+            "state": "Bihar"
+        },
+        {
+            "sr_no": 56,
+            "institute": "Manipal Institute of Technology",
+            "city": "Manipal",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 57,
+            "institute": "Netaji Subhas University of Technology (NSUT)",
+            "city": "Delhi",
+            "state": "Delhi"
+        },
+        {
+            "sr_no": 58,
+            "institute": "Dr. B R Ambedkar National Institute of Technology Jalandhar",
+            "city": "Jalandhar",
+            "state": "Punjab"
+        },
+        {
+            "sr_no": 59,
+            "institute": "Sardar Vallabhbhai National Institute of Technology",
+            "city": "SURAT",
+            "state": "Gujarat"
+        },
+        {
+            "sr_no": 60,
+            "institute": "Motilal Nehru National Institute of Technology",
+            "city": "Prayagraj",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 61,
+            "institute": "Indian Institute of Technology Tirupati",
+            "city": "YERPEDU",
+            "state": "Andhra Pradesh"
+        },
+        {
+            "sr_no": 62,
+            "institute": "Indian Institute of Technology Jammu",
+            "city": "Jammu",
+            "state": "Jammu and Kashmir"
+        },
+        {
+            "sr_no": 63,
+            "institute": "Defence Institute of Advanced Technology",
+            "city": "Pune",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 64,
+            "institute": "Manipal University, Jaipur",
+            "city": "Jaipur",
+            "state": "Rajasthan"
+        },
+        {
+            "sr_no": 65,
+            "institute": "Indian Institute of Technology Palakkad",
+            "city": "Palakkad",
+            "state": "Kerala"
+        },
+        {
+            "sr_no": 66,
+            "institute": "Sathyabama Institute of Science and Technology",
+            "city": "Chennai",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 67,
+            "institute": "PSG College of Technology",
+            "city": "Coimbatore",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 68,
+            "institute": "National Institute of Technology Meghalaya",
+            "city": "Shillong",
+            "state": "Meghalaya"
+        },
+        {
+            "sr_no": 69,
+            "institute": "Visvesvaraya Technological University",
+            "city": "Belgaum",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 70,
+            "institute": "University of Hyderabad",
+            "city": "Hyderabad",
+            "state": "Telangana"
+        },
+        {
+            "sr_no": 71,
+            "institute": "National Institute of Technology Raipur",
+            "city": "Raipur",
+            "state": "Chhattisgarh"
+        },
+        {
+            "sr_no": 72,
+            "institute": "Maulana Azad National Institute of Technology",
+            "city": "Bhopal",
+            "state": "Madhya Pradesh"
+        },
+        {
+            "sr_no": 73,
+            "institute": "Indian Institute of Technology Bhilai",
+            "city": "Raipur",
+            "state": "Chhattisgarh"
+        },
+        {
+            "sr_no": 74,
+            "institute": "International Institute of Information Technology Bangalore",
+            "city": "Bengaluru",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 75,
+            "institute": "M. S. Ramaiah Institute of Technology",
+            "city": "Bengaluru",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 76,
+            "institute": "Sant Longowal Institute of Engineering and Technology",
+            "city": "Longowal",
+            "state": "Punjab"
+        },
+        {
+            "sr_no": 77,
+            "institute": "COEP Technological University",
+            "city": "Pune",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 78,
+            "institute": "Banasthali Vidyapith",
+            "city": "Banasthali",
+            "state": "Rajasthan"
+        },
+        {
+            "sr_no": 79,
+            "institute": "National Institute of Technology Srinagar",
+            "city": "Srinagar",
+            "state": "Jammu and Kashmir"
+        },
+        {
+            "sr_no": 80,
+            "institute": "Rajiv Gandhi Institute of Petroleum Technology",
+            "city": "Amethi",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 81,
+            "institute": "National Institute of Technology Kurukshetra",
+            "city": "Kurukshetra",
+            "state": "Haryana"
+        },
+        {
+            "sr_no": 82,
+            "institute": "National Institute of Technology Agartala",
+            "city": "Agratala",
+            "state": "Tripura"
+        },
+        {
+            "sr_no": 83,
+            "institute": "Sri Krishna College of Engineering and Technology",
+            "city": "Coimbatore",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 84,
+            "institute": "Madan Mohan Malaviya University of Technology",
+            "city": "Gorakhpur",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 85,
+            "institute": "Indraprastha Institute of Information Technology",
+            "city": "New Delhi",
+            "state": "Delhi"
+        },
+        {
+            "sr_no": 86,
+            "institute": "Vel Tech Rangarajan Dr. Sagunthala R & D Institute of Science and Technology",
+            "city": "Chennai",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 87,
+            "institute": "Indian Institute of Information Technology Allahabad",
+            "city": "Prayagraj",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 88,
+            "institute": "Jawaharlal Nehru Technological University",
+            "city": "Hyderabad",
+            "state": "Telangana"
+        },
+        {
+            "sr_no": 89,
+            "institute": "Guru Gobind Singh Indraprastha University",
+            "city": "New Delhi",
+            "state": "Delhi"
+        },
+        {
+            "sr_no": 90,
+            "institute": "AU College of Engineering (A)",
+            "city": "Visakhapatnam",
+            "state": "Andhra Pradesh"
+        },
+        {
+            "sr_no": 91,
+            "institute": "Vignan's Foundation for Science, Technology and Research",
+            "city": "Guntur",
+            "state": "Andhra Pradesh"
+        },
+        {
+            "sr_no": 92,
+            "institute": "Shoolini University of Biotechnology and Management Sciences",
+            "city": "Solan",
+            "state": "Himachal Pradesh"
+        },
+        {
+            "sr_no": 93,
+            "institute": "Christ University",
+            "city": "Bengaluru",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 94,
+            "institute": "Chitkara University",
+            "city": "Rajpura",
+            "state": "Punjab"
+        },
+        {
+            "sr_no": 95,
+            "institute": "Jain University, Bangalore",
+            "city": "Bengaluru",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 96,
+            "institute": "C.V. Raman Global University, Odisha",
+            "city": "Bhubaneswar",
+            "state": "Odisha"
+        },
+        {
+            "sr_no": 97,
+            "institute": "National Institute of Technology Puducherry",
+            "city": "Karaikal",
+            "state": "Pondicherry"
+        },
+        {
+            "sr_no": 98,
+            "institute": "SR University",
+            "city": "Warangal",
+            "state": "Telangana"
+        },
+        {
+            "sr_no": 99,
+            "institute": "R.V. College of Engineering",
+            "city": "Bengaluru",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 100,
+            "institute": "Siddaganga Institute of Technology",
+            "city": "Tumkur",
+            "state": "Karnataka"
+        }
+    ],
+    "tier_2_colleges": [
+        {
+            "sr_no": 1,
+            "institute": "NIT Surathkal",
+            "city": "Surathkal",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 2,
+            "institute": "NIT Calicut",
+            "city": "Calicut",
+            "state": "Kerala"
+        },
+        {
+            "sr_no": 3,
+            "institute": "VNIT Nagpur",
+            "city": "Nagpur",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 4,
+            "institute": "NIT Durgapur",
+            "city": "Durgapur",
+            "state": "West Bengal"
+        },
+        {
+            "sr_no": 5,
+            "institute": "NIT Jalandhar",
+            "city": "Jalandhar",
+            "state": "Punjab"
+        },
+        {
+            "sr_no": 6,
+            "institute": "NIT Patna",
+            "city": "Patna",
+            "state": "Bihar"
+        },
+        {
+            "sr_no": 7,
+            "institute": "NIT Kurukshetra",
+            "city": "Kurukshetra",
+            "state": "Haryana"
+        },
+        {
+            "sr_no": 8,
+            "institute": "NIT Raipur",
+            "city": "Raipur",
+            "state": "Chhattisgarh"
+        },
+        {
+            "sr_no": 9,
+            "institute": "NIT Meghalaya",
+            "city": "Shillong",
+            "state": "Meghalaya"
+        },
+        {
+            "sr_no": 10,
+            "institute": "NIT Bhopal (MANIT)",
+            "city": "Bhopal",
+            "state": "Madhya Pradesh"
+        },
+        {
+            "sr_no": 11,
+            "institute": "NIT Goa",
+            "city": "Farmagudi",
+            "state": "Goa"
+        },
+        {
+            "sr_no": 12,
+            "institute": "NIT Agartala",
+            "city": "Agartala",
+            "state": "Tripura"
+        },
+        {
+            "sr_no": 13,
+            "institute": "NIT Manipur",
+            "city": "Imphal",
+            "state": "Manipur"
+        },
+        {
+            "sr_no": 14,
+            "institute": "NIT Silchar",
+            "city": "Silchar",
+            "state": "Assam"
+        },
+        {
+            "sr_no": 15,
+            "institute": "IIIT Bangalore",
+            "city": "Bangalore",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 16,
+            "institute": "IIIT Delhi",
+            "city": "New Delhi",
+            "state": "Delhi"
+        },
+        {
+            "sr_no": 17,
+            "institute": "IIITM Gwalior",
+            "city": "Gwalior",
+            "state": "Madhya Pradesh"
+        },
+        {
+            "sr_no": 18,
+            "institute": "IIIT Jabalpur",
+            "city": "Jabalpur",
+            "state": "Madhya Pradesh"
+        },
+        {
+            "sr_no": 19,
+            "institute": "IIEST Shibpur",
+            "city": "Howrah",
+            "state": "West Bengal"
+        },
+        {
+            "sr_no": 20,
+            "institute": "Delhi Technological University",
+            "city": "New Delhi",
+            "state": "Delhi"
+        },
+        {
+            "sr_no": 21,
+            "institute": "Jadavpur University",
+            "city": "Kolkata",
+            "state": "West Bengal"
+        },
+        {
+            "sr_no": 22,
+            "institute": "Anna University",
+            "city": "Chennai",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 23,
+            "institute": "Jamia Millia Islamia",
+            "city": "New Delhi",
+            "state": "Delhi"
+        },
+        {
+            "sr_no": 24,
+            "institute": "Siksha \u00e2\u20ac\u02dcO\u00e2\u20ac\u2122 Anusandhan",
+            "city": "Bhubaneswar",
+            "state": "Odisha"
+        },
+        {
+            "sr_no": 25,
+            "institute": "Aligarh Muslim University",
+            "city": "Aligarh",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 26,
+            "institute": "Koneru Lakshmaiah University",
+            "city": "Vaddeswaram",
+            "state": "Andhra Pradesh"
+        },
+        {
+            "sr_no": 27,
+            "institute": "Sri Sivasubramaniya Nadar College of Engineering",
+            "city": "Chennai",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 28,
+            "institute": "RV College of Engineering",
+            "city": "Bangalore",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 29,
+            "institute": "BITS Pilani",
+            "city": "Pilani",
+            "state": "Rajasthan"
+        },
+        {
+            "sr_no": 30,
+            "institute": "VIT Vellore",
+            "city": "Vellore",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 31,
+            "institute": "SRM Institute of Science and Technology",
+            "city": "Chennai",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 32,
+            "institute": "Manipal Institute of Technology",
+            "city": "Manipal",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 33,
+            "institute": "Amrita Vishwa Vidyapeetham",
+            "city": "Coimbatore",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 34,
+            "institute": "KIIT Bhubaneswar",
+            "city": "Bhubaneswar",
+            "state": "Odisha"
+        },
+        {
+            "sr_no": 35,
+            "institute": "SASTRA University",
+            "city": "Thanjavur",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 36,
+            "institute": "Chandigarh University",
+            "city": "Mohali",
+            "state": "Punjab"
+        },
+        {
+            "sr_no": 37,
+            "institute": "Lovely Professional University",
+            "city": "Phagwara",
+            "state": "Punjab"
+        },
+        {
+            "sr_no": 38,
+            "institute": "Alliance University",
+            "city": "Bangalore",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 39,
+            "institute": "Amity University",
+            "city": "Noida",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 40,
+            "institute": "BML Munjal University",
+            "city": "Gurgaon",
+            "state": "Haryana"
+        },
+        {
+            "sr_no": 41,
+            "institute": "GD Goenka University",
+            "city": "Gurgaon",
+            "state": "Haryana"
+        },
+        {
+            "sr_no": 42,
+            "institute": "NIIT University",
+            "city": "Neemrana",
+            "state": "Rajasthan"
+        },
+        {
+            "sr_no": 43,
+            "institute": "Jain University",
+            "city": "Bangalore",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 44,
+            "institute": "UPES",
+            "city": "Dehradun",
+            "state": "Uttarakhand"
+        },
+        {
+            "sr_no": 45,
+            "institute": "Bharati Vidyapeeth Deemed University",
+            "city": "Pune",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 46,
+            "institute": "Lingaya\u00e2\u20ac\u2122s University",
+            "city": "Faridabad",
+            "state": "Haryana"
+        },
+        {
+            "sr_no": 47,
+            "institute": "Jaipur National University",
+            "city": "Jaipur",
+            "state": "Rajasthan"
+        },
+        {
+            "sr_no": 48,
+            "institute": "Galgotias University",
+            "city": "Greater Noida",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 49,
+            "institute": "MIT Pune",
+            "city": "Pune",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 50,
+            "institute": "PEC University of Technology",
+            "city": "Chandigarh",
+            "state": "Chandigarh"
+        },
+        {
+            "sr_no": 51,
+            "institute": "Thapar Institute",
+            "city": "Patiala",
+            "state": "Punjab"
+        },
+        {
+            "sr_no": 52,
+            "institute": "Shanmugha Arts Science Tech & Research Academy",
+            "city": "Thanjavur",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 53,
+            "institute": "BIT Mesra",
+            "city": "Ranchi",
+            "state": "Jharkhand"
+        },
+        {
+            "sr_no": 54,
+            "institute": "SSN College of Engineering",
+            "city": "Chennai",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 55,
+            "institute": "PSG College of Technology",
+            "city": "Coimbatore",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 56,
+            "institute": "Mepco Schlenk Engineering College",
+            "city": "Sivakasi",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 57,
+            "institute": "VJTI",
+            "city": "Mumbai",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 58,
+            "institute": "ICT",
+            "city": "Mumbai",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 59,
+            "institute": "DIAT",
+            "city": "Pune",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 60,
+            "institute": "CEG, Anna University",
+            "city": "Chennai",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 61,
+            "institute": "Loyola-ICAM College of Engineering",
+            "city": "Chennai",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 62,
+            "institute": "IIIT Hyderabad",
+            "city": "Hyderabad",
+            "state": "Telangana"
+        },
+        {
+            "sr_no": 63,
+            "institute": "IIIT Allahabad",
+            "city": "Allahabad",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 64,
+            "institute": "BITS Hyderabad",
+            "city": "Hyderabad",
+            "state": "Telangana"
+        },
+        {
+            "sr_no": 65,
+            "institute": "SRM University, Ramapuram",
+            "city": "Chennai",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 66,
+            "institute": "SRM University, Amaravati",
+            "city": "Amaravati",
+            "state": "Andhra Pradesh"
+        },
+        {
+            "sr_no": 67,
+            "institute": "JNTU Hyderabad",
+            "city": "Hyderabad",
+            "state": "Telangana"
+        },
+        {
+            "sr_no": 68,
+            "institute": "JNTU Kakinada",
+            "city": "Kakinada",
+            "state": "Andhra Pradesh"
+        },
+        {
+            "sr_no": 69,
+            "institute": "JNTU Anantapur",
+            "city": "Anantapur",
+            "state": "Andhra Pradesh"
+        },
+        {
+            "sr_no": 70,
+            "institute": "Osmania University \u00e2\u20ac\u201c College of Engineering",
+            "city": "Hyderabad",
+            "state": "Telangana"
+        },
+        {
+            "sr_no": 71,
+            "institute": "Andhra University College of Engineering",
+            "city": "Visakhapatnam",
+            "state": "Andhra Pradesh"
+        },
+        {
+            "sr_no": 72,
+            "institute": "UVCE",
+            "city": "Bangalore",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 73,
+            "institute": "MS Ramaiah Institute of Technology",
+            "city": "Bangalore",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 74,
+            "institute": "BMS College of Engineering",
+            "city": "Bangalore",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 75,
+            "institute": "Reva University",
+            "city": "Bangalore",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 76,
+            "institute": "Dayananda Sagar College of Engineering",
+            "city": "Bangalore",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 77,
+            "institute": "Nitte Meenakshi Institute of Technology",
+            "city": "Bangalore",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 78,
+            "institute": "Bangalore Institute of Technology",
+            "city": "Bangalore",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 79,
+            "institute": "Siddaganga Institute of Technology",
+            "city": "Tumkur",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 80,
+            "institute": "KLE Technological University",
+            "city": "Hubli",
+            "state": "Karnataka"
+        },
+        {
+            "sr_no": 81,
+            "institute": "MAIT",
+            "city": "New Delhi",
+            "state": "Delhi"
+        },
+        {
+            "sr_no": 82,
+            "institute": "Bharati Vidyapeeth College of Engineering",
+            "city": "Pune",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 83,
+            "institute": "MIT World Peace University",
+            "city": "Pune",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 84,
+            "institute": "Dr. D. Y. Patil Institute of Technology",
+            "city": "Pune",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 85,
+            "institute": "COEP Tech",
+            "city": "Pune",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 86,
+            "institute": "Government College of Engineering",
+            "city": "Karad",
+            "state": "Maharashtra"
+        },
+        {
+            "sr_no": 87,
+            "institute": "Harcourt Butler Technical University",
+            "city": "Kanpur",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 88,
+            "institute": "IET",
+            "city": "Lucknow",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 89,
+            "institute": "Zakir Husain College of Engg & Technology",
+            "city": "Aligarh",
+            "state": "Uttar Pradesh"
+        },
+        {
+            "sr_no": 90,
+            "institute": "Government College of Engineering",
+            "city": "Salem",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 91,
+            "institute": "Government College of Engineering",
+            "city": "Tirunelveli",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 92,
+            "institute": "Government College of Technology",
+            "city": "Coimbatore",
+            "state": "Tamil Nadu"
+        },
+        {
+            "sr_no": 93,
+            "institute": "Veer Surendra Sai University of Technology",
+            "city": "Burla",
+            "state": "Odisha"
+        },
+        {
+            "sr_no": 94,
+            "institute": "Indira Gandhi Institute of Technology",
+            "city": "Sarang",
+            "state": "Odisha"
+        },
+        {
+            "sr_no": 95,
+            "institute": "College of Engineering and Technology",
+            "city": "Bhubaneswar",
+            "state": "Odisha"
+        },
+        {
+            "sr_no": 96,
+            "institute": "UIET",
+            "city": "Chandigarh",
+            "state": "Chandigarh"
+        },
+        {
+            "sr_no": 97,
+            "institute": "Indira Gandhi Institute of Technology (IGIT)",
+            "city": "Dhenkanal",
+            "state": "Odisha"
+        },
+        {
+            "sr_no": 98,
+            "institute": "Bengal Engineering and Science University",
+            "city": "Howrah",
+            "state": "West Bengal"
+        },
+        {
+            "sr_no": 99,
+            "institute": "University Institute of Engineering and Technology (UIET)",
+            "city": "Chandigarh",
+            "state": "Chandigarh"
+        }
+    ]
+}

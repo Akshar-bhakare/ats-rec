@@ -1,0 +1,480 @@
+/**
+ * Judge0 CE Backend Test
+ * 
+ * Tests the complete Judge0 CE integration:
+ * 1. Verifies Judge0 CE is running
+ * 2. Tests execution for all supported languages using actual driver templates
+ * 3. Tests error handling (compilation errors, runtime errors)
+ * 4. Verifies JSON harness output parsing
+ * 
+ * Prerequisites:
+ * - Judge0 CE running on JUDGE0_URL (default: http://localhost:2358)
+ * - Environment variables configured in .env
+ */
+
+import axios from 'axios';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { buildSourceWithHarness, buildStdinPayload } from '../utils/driverTemplates.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+dotenv.config({ path: join(__dirname, '../../.env') });
+
+// Configuration
+const JUDGE0_URL = process.env.JUDGE0_URL || 'http://localhost:2358';
+const JUDGE0_TIMEOUT = parseInt(process.env.JUDGE0_WAIT_TIMEOUT || '10', 10);
+
+// Test counters
+let totalTests = 0;
+let passedTests = 0;
+let failedTests = 0;
+
+// Color output helpers
+const colors = {
+    reset: '\x1b[0m',
+    green: '\x1b[32m',
+    red: '\x1b[31m',
+    yellow: '\x1b[33m',
+    blue: '\x1b[34m',
+    cyan: '\x1b[36m'
+};
+
+function log(message, color = 'reset') {
+    console.log(`${colors[color]}${message}${colors.reset}`);
+}
+
+function logTest(name, passed, details = '') {
+    totalTests++;
+    if (passed) {
+        passedTests++;
+        log(`✅ ${name}`, 'green');
+    } else {
+        failedTests++;
+        log(`❌ ${name}`, 'red');
+        if (details) log(`   ${details}`, 'yellow');
+    }
+}
+
+/**
+ * Test 1: Verify Judge0 CE is running
+ */
+async function testJudge0Connection() {
+    log('\n=== Test 1: Judge0 CE Connection ===', 'cyan');
+    try {
+        const response = await axios.get(`${JUDGE0_URL}/about`, { timeout: 5000 });
+        logTest('Judge0 CE is reachable', true);
+        log(`   Version: ${response.data.version || 'Unknown'}`, 'blue');
+        return true;
+    } catch (error) {
+        logTest('Judge0 CE is reachable', false, `Cannot connect to ${JUDGE0_URL}. Is Judge0 CE running?`);
+        return false;
+    }
+}
+
+/**
+ * Language Test Definitions
+ * Defines a simple test case for each language to verify harness working
+ */
+const languageTests = [
+    {
+        name: 'Python',
+        judge0Id: 71,
+        signature: { functionName: 'add', params: [{name:'a', type:'int'}, {name:'b', type:'int'}], returnType: 'int', className: 'Solution' },
+        userSource: `class Solution:\n    def add(self, a, b):\n        return a + b`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'JavaScript',
+        judge0Id: 63,
+        signature: { functionName: 'add', params: [{name:'a', type:'number'}, {name:'b', type:'number'}], returnType: 'number', className: 'Solution' },
+        userSource: `class Solution {\n    add(a, b) {\n        return a + b;\n    }\n}`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'TypeScript',
+        judge0Id: 74,
+        signature: { functionName: 'add', params: [{name:'a', type:'number'}, {name:'b', type:'number'}], returnType: 'number', className: 'Solution' },
+        userSource: `class Solution {\n    add(a: number, b: number): number {\n        return a + b;\n    }\n}`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'Java',
+        judge0Id: 62,
+        signature: { functionName: 'add', params: [{name:'a', type:'int'}, {name:'b', type:'int'}], returnType: 'int', className: 'Solution' },
+        userSource: `class Solution {\n    public int add(int a, int b) {\n        return a + b;\n    }\n}`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'C++',
+        judge0Id: 54,
+        signature: { functionName: 'add', params: [{name:'a', type:'int'}, {name:'b', type:'int'}], returnType: 'int', className: 'Solution' },
+        userSource: `class Solution {\npublic:\n    int add(int a, int b) {\n        return a + b;\n    }\n};`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'C',
+        judge0Id: 50,
+        signature: { functionName: 'add', params: [{name:'a', type:'int'}, {name:'b', type:'int'}], returnType: 'int' },
+        userSource: `int add(int a, int b) {\n    return a + b;\n}`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'Go',
+        judge0Id: 60,
+        signature: { functionName: 'add', params: [{name:'a', type:'int'}, {name:'b', type:'int'}], returnType: 'int' },
+        userSource: `func (s Solution) Add(a int, b int) int {\n    return a + b\n}`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'Kotlin',
+        judge0Id: 78,
+        signature: { functionName: 'add', params: [{name:'a', type:'Int'}, {name:'b', type:'Int'}], returnType: 'Int', className: 'Solution' },
+        userSource: `class Solution {\n    fun add(a: Int, b: Int): Int {\n        return a + b\n    }\n}`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'Swift',
+        judge0Id: 83,
+        signature: { functionName: 'add', params: [{name:'a', type:'Int'}, {name:'b', type:'Int'}], returnType: 'Int', className: 'Solution' },
+        userSource: `class Solution {\n    func add(_ a: Int, _ b: Int) -> Int {\n        return a + b\n    }\n}`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'PHP',
+        judge0Id: 68,
+        signature: { functionName: 'add', params: [{name:'a'}, {name:'b'}], returnType: 'int', className: 'Solution' },
+        userSource: `class Solution {\n    function add($a, $b) {\n        return $a + $b;\n    }\n}`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'Ruby',
+        judge0Id: 72,
+        signature: { functionName: 'add', params: [{name:'a'}, {name:'b'}], className: 'Solution' },
+        userSource: `class Solution\n    def add(a, b)\n        return a + b\n    end\nend`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'Rust',
+        judge0Id: 73,
+        signature: { functionName: 'add', params: [{name:'a', type:'i32'}, {name:'b', type:'i32'}], returnType: 'i32', className: 'Solution' },
+        userSource: `impl Solution {\n    fn add(&self, a: i32, b: i32) -> i32 {\n        a + b\n    }\n}`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'Scala',
+        judge0Id: 81,
+        signature: { functionName: 'add', params: [{name:'a', type:'Int'}, {name:'b', type:'Int'}], returnType: 'Int', className: 'Solution' },
+        userSource: `class Solution {\n    def add(a: Int, b: Int): Int = {\n        a + b\n    }\n}`,
+        args: [5, 10],
+        expected: 15
+    }
+];
+
+// Phase 3 Languages (Optional/Experimental support)
+const phase3Tests = [
+    {
+        name: 'R',
+        judge0Id: 80,
+        signature: { functionName: 'add', params: [{name:'a'}, {name:'b'}], className: 'Solution' },
+        userSource: `add <- function(a, b) {\n    return(a + b)\n}`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'Bash',
+        judge0Id: 46,
+        signature: { functionName: 'add', params: [{name:'a'}, {name:'b'}] },
+        userSource: `function add {\n    echo $(($1 + $2))\n}`,
+        args: ["5", "10"],
+        expected: ["15"],
+        customCheck: (actual, expected) => {
+             const act = Array.isArray(actual) ? actual[0] : actual;
+             const exp = Array.isArray(expected) ? expected[0] : expected;
+             return parseInt(act) === parseInt(exp);
+        }
+    },
+    {
+        name: 'Perl',
+        judge0Id: 85,
+        signature: { functionName: 'add', params: [{name:'a'}, {name:'b'}] },
+        userSource: `sub add {\n    my ($a, $b) = @_;\n    return $a + $b;\n}`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'Elixir',
+        judge0Id: 57,
+        signature: { functionName: 'add', params: [{name:'a'}, {name:'b'}], className: 'Solution' },
+        userSource: `defmodule Solution do\n  def add(a, b) do\n    a + b\n  end\nend`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'Haskell',
+        judge0Id: 61,
+        signature: { functionName: 'add', params: [{name:'a'}, {name:'b'}] },
+        userSource: `add :: Int -> Int -> Int\nadd a b = a + b`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'Lua',
+        judge0Id: 64,
+        signature: { functionName: 'add', params: [{name:'a'}, {name:'b'}] },
+        userSource: `function add(a, b)\n  return a + b\nend`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'Objective-C',
+        judge0Id: 79,
+        signature: { functionName: 'add', params: [{name:'a', type:'int'}, {name:'b', type:'int'}], returnType: 'int', className: 'Solution' },
+        userSource: `@interface Solution : NSObject\n- (int)add:(int)a withArg:(int)b;\n@end\n\n@implementation Solution\n- (int)add:(int)a withArg:(int)b {\n    return a + b;\n}\n@end`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'Clojure',
+        judge0Id: 86,
+        signature: { functionName: 'add', params: [{name:'a'}, {name:'b'}] },
+        userSource: `(defn add [a b] (+ a b))`,
+        args: [5, 10],
+        expected: 15
+    },
+    {
+        name: 'SQL',
+        judge0Id: 82,
+        signature: { functionName: 'solve' },
+        userSource: `SELECT '{"results":[15]}';`,
+        args: [],
+        expected: 15,
+        customCheck: (actual, expected) => {
+            return actual === 15;
+        }
+    }
+];
+
+/**
+ * Execute a test for a specific language
+ */
+async function runLanguageTest(testConfig) {
+    try {
+        log(`   Testing ${testConfig.name}...`, 'reset');
+        
+        // 1. Build Source with Harness
+        const fullSource = buildSourceWithHarness({
+            language: { judge0Id: testConfig.judge0Id },
+            userSource: testConfig.userSource,
+            signature: testConfig.signature
+        });
+
+        // 2. Build Stdin Payload
+        const stdin = buildStdinPayload({
+            signature: testConfig.signature,
+            testCase: { args: testConfig.args }
+        });
+
+        // 3. Submit to Judge0
+        const response = await axios.post(
+            `${JUDGE0_URL}/submissions?base64_encoded=false&wait=true`,
+            {
+                language_id: testConfig.judge0Id,
+                source_code: fullSource,
+                stdin: stdin,
+                cpu_time_limit: 5,
+                memory_limit: 128000
+            },
+            { timeout: JUDGE0_TIMEOUT * 1000 }
+        );
+
+        const result = response.data;
+                
+        console.log("\n[ DEBUG] status =", result.status);
+        console.log("[ DEBUG] compile_output =", result.compile_output?.slice(0, 400));
+        console.log("[DEBUG] stderr =", result.stderr?.slice(0, 400));
+        console.log("[ DEBUG] stdout =", result.stdout?.slice(0, 400));
+        console.log("[ DEBUG] message =", result.message);
+        console.log("[ DEBUG] full =", JSON.stringify(result, null, 2));
+        
+
+        
+        // 4. Verify Verdict
+        if (result.status?.id !== 3) {
+            logTest(`${testConfig.name} execution`, false, `Status: ${result.status?.description}`);
+            if (result.compile_output) log(`      Compile Error: ${result.compile_output.substring(0, 100)}...`, 'red');
+            if (result.stderr) log(`      Stderr: ${result.stderr.substring(0, 100)}...`, 'red');
+            return false;
+        }
+
+        // 5. Verify Output
+        if (!result.stdout) {
+            logTest(`${testConfig.name} has stdout`, false, 'No stdout returned');
+            return false;
+        }
+
+        try {
+            const output = JSON.parse(result.stdout.trim());
+            
+            if (output.error) {
+                logTest(`${testConfig.name} harness error`, false, `Harness reported error: ${output.error}`);
+                return false;
+            }
+
+            const actualResult = output.results[0];
+            
+            let isCorrect = false;
+            if (testConfig.customCheck) {
+                isCorrect = testConfig.customCheck(actualResult, testConfig.expected);
+            } else {
+                isCorrect = JSON.stringify(actualResult) === JSON.stringify(testConfig.expected);
+            }
+
+            logTest(`${testConfig.name} result correct`, isCorrect, `Expected: ${testConfig.expected}, Got: ${actualResult}`);
+            return isCorrect;
+
+        } catch (e) {
+            logTest(`${testConfig.name} valid JSON`, false, `Parse error: ${e.message}\nOutput: ${result.stdout}`);
+            return false;
+        }
+
+    } catch (error) {
+        logTest(`${testConfig.name} execution error`, false, error.message);
+        return false;
+    }
+}
+
+/**
+ * Test Error Handling (Compilation & Runtime)
+ * We'll use Python for these checks as it's reliable
+ */
+async function testErrorHandling() {
+    log('\n=== Error Handling Tests ===', 'cyan');
+
+    // Compilation Error
+    const compErrorSource = `class Solution:\n    def add(self, a, b):\n        retur a + b  # Syntax error`;
+    try {
+        const response = await axios.post(
+            `${JUDGE0_URL}/submissions?base64_encoded=false&wait=true`,
+            {
+                language_id: 71,
+                source_code: compErrorSource,
+                stdin: "",
+                cpu_time_limit: 2
+            },
+            { timeout: JUDGE0_TIMEOUT * 1000 }
+        );
+        const result = response.data;
+        logTest('Compilation error detection', result.status?.id === 6, `Got status: ${result.status?.description}`);
+    } catch (e) {
+        logTest('Compilation error test', false, e.message);
+    }
+
+    // Runtime Error (Zero Division)
+    const runtimeErrorSource = `class Solution:\n    def divide(self, a, b):\n        return a // b`;
+    const runtimeConfig = {
+        name: 'Runtime Error',
+        judge0Id: 71, // Python
+        signature: { functionName: 'divide', params: [{name:'a'}, {name:'b'}], className: 'Solution' },
+        userSource: runtimeErrorSource,
+        args: [10, 0], // Div by zero
+        expected: null
+    };
+
+    // We expect the HARNESS to catch this and print a JSON error, OR Judge0 to report Runtime Error (11)
+    // Our harness catches exceptions, so we expect status 3 (Accepted) but output containing "error"
+    try {
+        const fullSource = buildSourceWithHarness({
+            language: { judge0Id: 71 },
+            userSource: runtimeErrorSource,
+            signature: runtimeConfig.signature
+        });
+        const stdin = buildStdinPayload({ signature: runtimeConfig.signature, testCase: { args: runtimeConfig.args } });
+
+        const response = await axios.post(
+            `${JUDGE0_URL}/submissions?base64_encoded=false&wait=true`,
+            {
+                language_id: 71,
+                source_code: fullSource,
+                stdin: stdin,
+                cpu_time_limit: 2
+            },
+            { timeout: JUDGE0_TIMEOUT * 1000 }
+        );
+        const result = response.data;
+        
+        if (result.stdout) {
+            const output = JSON.parse(result.stdout.trim());
+            logTest('Harness caught runtime error', !!output.error, `Error: ${output.error}`);
+        } else {
+             // Fallback check if Judge0 caught it directly
+             logTest('Runtime error status', result.status?.id !== 3, `Status: ${result.status?.description}`);
+        }
+
+    } catch (e) {
+        logTest('Runtime error test', false, e.message);
+    }
+}
+
+/**
+ * Main test runner
+ */
+async function runAllTests() {
+    log('\n╔════════════════════════════════════════════╗', 'cyan');
+    log('║   Judge0 CE Backend Integration Tests   ║', 'cyan');
+    log('╚════════════════════════════════════════════╝', 'cyan');
+    
+    log(`\nConfiguration:`, 'blue');
+    log(`  Judge0 URL: ${JUDGE0_URL}`, 'blue');
+    
+    const connectionOk = await testJudge0Connection();
+    if (!connectionOk) {
+        log('\n❌ Cannot proceed without Judge0 CE connection', 'red');
+        process.exit(1);
+    }
+
+    log('\n=== Language Support Tests ===', 'cyan');
+    
+    // Run Standard Languages
+    for (const test of languageTests) {
+        await runLanguageTest(test);
+    }
+
+    // Run Phase 3 Languages (Optional - log but don't fail entire suite if configured to skip)
+    log('\n=== Phase 3 / Experimental Languages ===', 'cyan');
+    for (const test of phase3Tests) {
+        await runLanguageTest(test);
+    }
+
+    // Run Error Handling
+    await testErrorHandling();
+    
+    // Summary
+    log('\n╔════════════════════════════════════════════╗', 'cyan');
+    log('║              Test Summary                ║', 'cyan');
+    log('╚════════════════════════════════════════════╝', 'cyan');
+    log(`\nTotal Tests: ${totalTests}`, 'blue');
+    log(`Passed: ${passedTests}`, 'green');
+    log(`Failed: ${failedTests}`, failedTests > 0 ? 'red' : 'green');
+    
+    process.exit(failedTests === 0 ? 0 : 1);
+}
+
+runAllTests().catch(error => {
+    console.error('Fatal Error:', error);
+    process.exit(1);
+});

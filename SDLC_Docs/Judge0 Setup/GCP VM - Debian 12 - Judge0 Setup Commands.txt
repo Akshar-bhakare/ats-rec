@@ -1,0 +1,42 @@
+GCP VM - Debian 12 Bookworm, any available machine config for selected zone, 50GB Balanced Persistent disk, Allow all network traffic...
+GCP VM Firewall Rule - custom-hirexit--judge0-rule
+                        Target tags:
+                            http-server
+                            https-server
+                        Source Filter:
+                            IP Ranges:
+                                0.0.0.0/0
+                        Protocols and ports:
+                            tcp:2358
+
+clear && sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
+curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker $USER
+newgrp docker
+docker --version
+sudo apt install -y docker-compose-plugin
+docker compose version
+git clone https://github.com/judge0/judge0.git
+cd judge0
+nano judge0.conf
+
+Pass@Redis5
+Pass@PostGres5
+
+docker compose up -d
+docker ps
+curl -v http://127.0.0.1:2358/languages
+curl -s -X POST "http://127.0.0.1:2358/submissions?base64_encoded=false&wait=true" -H "Content-Type: application/json" -d '{"language_id":71,"source_code":"print(42)"}'
+
+if memory permission not available:
+docker compose down -v
+sudo nano /etc/default/grub
+
+GRUB_CMDLINE_LINUX="console=tty0 console=ttyS0,115200 earlyprintk=ttyS0,115200 consoleblank=0 systemd.unified_cgroup_hierarchy=0 cgroup_enable=memory swapaccount=1 cgroup_no_v2=all"
+
+sudo update-grub
+sudo reboot
+stat -fc %T /sys/fs/cgroup
+ls -ld /sys/fs/cgroup/memory
+cat /proc/cmdline
+clear && cd judge0 && docker compose up -d
